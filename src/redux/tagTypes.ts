@@ -16,6 +16,7 @@ export const tagTypes = {
   conversation: "Conversation",
   interactionManagement: "InteractionManagement",
   coupon: "Coupon",
+  subscription: "Subscription",
 };
 
 export const tagTypesList = [
@@ -36,4 +37,5 @@ export const tagTypesList = [
   tagTypes.interactionManagement,
   tagTypes.report,
   tagTypes.coupon,
+  tagTypes.subscription,
 ];

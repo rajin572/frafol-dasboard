@@ -95,8 +95,6 @@ export const mainTheme = {
     Radio: {
       colorPrimary: "#ad2b08",
     },
-    Rate: {
-      starBg: "#ffc70066",
-    },
+    Rate: {},
   },
 };

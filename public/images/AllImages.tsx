@@ -11,6 +11,7 @@ import profile from "./dummyProfile.jpg";
 import cover from "./dummyCover.jpg";
 import photo from "./photo.png";
 import product from "./product.jpg";
+import batch from "./batch.png";
 
 // Icons
 
@@ -22,6 +23,7 @@ export const AllImages = {
   cover,
   photo,
   product,
+  batch,
 };
 
 export const AuthImages = {

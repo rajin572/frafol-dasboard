@@ -38,7 +38,7 @@ import ConversationPage from "../pages/Common/ConversationPage";
 import InteractionMessages from "../pages/Admin/InteractionManagement/InteractionMessages";
 import InteractionCommunityForum from "../pages/Admin/InteractionManagement/InteractionCommunityForum";
 import AdminAllCupon from "../pages/Admin/AdminAllCupon";
-import AdminAllInsucance from "../pages/Admin/AdminAllInsucance";
+import AdminChoiceManagement from "../pages/Admin/AdminChoiceManagement";
 import PrivacyAndPolicy from "../pages/Common/settings/PrivacyAndPolicy";
 import WebsiteFunctionality from "../pages/Common/settings/WebsiteFunctionality";
 import SearchAlgorithm from "../pages/Common/settings/SearchAlgorithm";
@@ -152,10 +152,10 @@ export const adminPaths = [
     icon: feedbackLogo,
   },
   {
-    path: "insurance",
-    element: <AdminAllInsucance />,
-    key: "insurance",
-    name: "Insurance Requests",
+    path: "frafol-choice",
+    element: <AdminChoiceManagement />,
+    key: "frafol-choice",
+    name: "Frafol Choice",
     icon: feedbackLogo,
   },
   {
@@ -243,7 +243,7 @@ export const adminPaths = [
       {
         key: "website-functionality-and-compatibility",
         path: "documentation/website-functionality-and-compatibility",
-        name: " Website Functionality",
+        name: "Website Functionality",
         icon: dashboardLogo,
         element: <WebsiteFunctionality />,
       },

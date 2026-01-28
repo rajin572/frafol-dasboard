@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Space, Tooltip } from "antd";
+import { Rate, Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
 import ReuseTable from "../../utils/ReuseTable";
 import { IUser } from "../../types";
+import { AllImages } from "../../../public/images/AllImages";
+import { formatDate } from "../../utils/dateFormet";
 
 // Define the type for the props
 interface UserProfessionalTableProps {
@@ -46,6 +48,22 @@ const UserProfessionalTable: React.FC<UserProfessionalTableProps> = ({
       render: (text: string, record: IUser) => (
         <span>
           {text} {record.sureName}
+        </span>
+      ),
+    },
+    {
+      title: "Frafol Choice",
+      dataIndex: "hasActiveSubscription",
+      key: "hasActiveSubscription",
+      render: (_: string, record: IUser) => (
+        <span>
+          {record.hasActiveSubscription ?
+            <div className="flex items-center gap-2">
+              <div className="p-1 rounded-full bg-secondary-color">
+                <img src={AllImages.batch} alt="" className="w-4 h-4" />
+              </div>
+              <p>{formatDate(record.subscriptionExpiryDate || "")}</p>
+            </div> : "-"}
         </span>
       ),
     },
@@ -105,6 +123,15 @@ const UserProfessionalTable: React.FC<UserProfessionalTableProps> = ({
           {isBlocked ? "Blocked" : "Active"}
         </span>
       ),
+    },
+    {
+      title: "Avg. Rating",
+      dataIndex: "averageRating",
+      key: "averageRating",
+      render: (val: number) => {
+        const rating = Number(val.toFixed(1));
+        return (<div className="flex items-center"><Rate disabled value={rating} count={5} allowHalf /><p className="ml-2">{rating}</p></div>);
+      },
     },
     {
       title: "Action",

@@ -52,8 +52,7 @@ const AdminAllUsers = () => {
     setIsViewModalVisible(true);
   };
 
-  const showViewPortfolioModal = (record: IUser) => {
-    setCurrentRecord(record);
+  const showViewPortfolioModal = () => {
     setIsViewProtfolioModalVisible(true);
   };
 
@@ -171,7 +170,7 @@ const AdminAllUsers = () => {
       />
       <UserViewPortfolioModal
         isViewProtfolioModalVisible={isViewProtfolioModalVisible}
-        handleCancel={handleCancel}
+        handleCancel={() => setIsViewProtfolioModalVisible(false)}
         currentRecord={currentRecord}
       />
       <BlockModal

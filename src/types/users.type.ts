@@ -1,6 +1,9 @@
 export interface IUser {
   _id: string;
-  profileId: string;
+  profileId: {
+    _id: string;
+    about: string;
+  };
   name: string;
   sureName: string;
   companyName: string;
@@ -29,4 +32,11 @@ export interface IUser {
   phone?: string;
   minHourlyRate: number;
   maxHourlyRate: number;
+  hasActiveSubscription: boolean;
+  subscriptionExpiryDate: string | null;
+  subscriptionDays: number;
+  subscriptionId: string;
+  zipCode: string;
+  introVideo: string;
+  bannerImages: string[];
 }

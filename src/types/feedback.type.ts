@@ -24,21 +24,14 @@ interface User {
   profileImage: string;
 }
 
-interface IInsurance {
+interface ISubscription {
   _id: string;
-  userId: User;
-  fullName: string;
-  companyName: string;
-  businessType: string;
-  ico: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  estimatedValue: number;
-  anyPreviousEquipment: string;
-  additionalNotes: string;
+  title: string;
+  duration: number;
+  price: number;
+  isActive: boolean;
   createdAt: string; // or Date if you parse it
   updatedAt: string; // or Date if you parse it
 }
 
-export type { IFeedback, IInsurance };
+export type { IFeedback, ISubscription };
