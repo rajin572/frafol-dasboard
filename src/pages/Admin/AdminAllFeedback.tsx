@@ -1,9 +1,11 @@
 import { useState } from "react";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
-import { useGetFeedbackQuery } from "../../redux/features/feedback/feedbackApi";
+import { useDeleteFeedbackMutation, useGetFeedbackQuery } from "../../redux/features/feedback/feedbackApi";
 import { IFeedback } from "../../types";
 import FeedbackTable from "../../ui/Tables/FeedbackTable";
 import AdminViewFeedbackModal from "../../ui/Modal/Feadback/AdminViewFeedbackModal";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import DeleteModal from "../../ui/Modal/DeleteModal";
 
 const AdminAllFeedback = () => {
   const limit = 10;
@@ -20,10 +22,12 @@ const AdminAllFeedback = () => {
   );
 
   const allFeedback: IFeedback[] = data?.data?.result || [];
+  const [deleteFeedback] = useDeleteFeedbackMutation();
 
   const total = data?.data?.meta?.total || 0;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<IFeedback | null>(null);
 
   const showViewUserModal = (record: IFeedback) => {
@@ -31,9 +35,26 @@ const AdminAllFeedback = () => {
     setIsViewModalVisible(true);
   };
 
+  const showDeleteModal = (record: IFeedback) => {
+    setCurrentRecord(record);
+    setIsDeleteModalVisible(true);
+  };
+
   const handleCancel = () => {
     setIsViewModalVisible(false);
+    setIsDeleteModalVisible(false);
     setCurrentRecord(null);
+  };
+
+
+  const handleDelete = async (data: IFeedback) => {
+    const response = await tryCatchWrapper(deleteFeedback, {
+      params: data?._id,
+    });
+
+    if (response?.statusCode === 200) {
+      handleCancel();
+    }
   };
 
   return (
@@ -54,6 +75,7 @@ const AdminAllFeedback = () => {
         data={allFeedback}
         loading={isFetching}
         showViewModal={showViewUserModal}
+        showDeleteModal={showDeleteModal}
         setPage={setPage}
         page={page}
         total={total}
@@ -62,6 +84,12 @@ const AdminAllFeedback = () => {
       <AdminViewFeedbackModal
         isViewModalVisible={isViewModalVisible}
         handleCancel={handleCancel}
+        currentRecord={currentRecord}
+      />
+      <DeleteModal
+        isDeleteModalVisible={isDeleteModalVisible}
+        handleCancel={handleCancel}
+        handleDelete={handleDelete}
         currentRecord={currentRecord}
       />
     </div>

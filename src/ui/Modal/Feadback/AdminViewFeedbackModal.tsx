@@ -2,6 +2,9 @@ import { Modal } from "antd";
 import { AllImages } from "../../../../public/images/AllImages";
 import { IFeedback } from "../../../types";
 import { getImageUrl } from "../../../helpers/config/envConfig";
+import ReuseButton from "../../Button/ReuseButton";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useApproveFeedbackMutation, useDeclineFeedbackMutation } from "../../../redux/features/feedback/feedbackApi";
 
 interface AdminViewFeedbackModalProps {
   isViewModalVisible: boolean;
@@ -15,13 +18,47 @@ const AdminViewFeedbackModal: React.FC<AdminViewFeedbackModalProps> = ({
   currentRecord,
 }) => {
   const serverUrl = getImageUrl();
+  const [approve] = useApproveFeedbackMutation();
+  const [decline] = useDeclineFeedbackMutation();
+
+  const handleApprove = async (record: IFeedback) => {
+    const res = await tryCatchWrapper(
+      approve,
+      {
+        params: record?._id,
+        body: { status: "verified" },
+      },
+      "Approving..."
+    );
+
+    if (res?.statusCode === 200) {
+      handleCancel();
+    }
+  };
+  const handleDecline = async (
+    record: IFeedback | null
+  ) => {
+    const res = await tryCatchWrapper(
+      decline,
+      {
+        params: record?._id,
+        body: { status: "declined" },
+
+      },
+      "Declining..."
+    );
+    if (res?.statusCode === 200) {
+      handleCancel();
+    }
+  };
+
   return (
     <Modal
       open={isViewModalVisible}
       onCancel={handleCancel}
       footer={null}
       centered
-      className="lg:!w-[450px]"
+      className="lg:!w-[760px]"
     >
       <div className="p-5">
         <div className="">
@@ -54,6 +91,26 @@ const AdminViewFeedbackModal: React.FC<AdminViewFeedbackModalProps> = ({
               </div>
             </div>
           </div>
+          {
+            currentRecord?.adminVerified === "pending" && (
+              <div className="flex items-center gap-3 mt-5">
+                <ReuseButton
+                  variant="secondary"
+                  className="!bg-success !border-success"
+                  onClick={() => handleApprove(currentRecord as IFeedback)}
+                >
+                  Approve
+                </ReuseButton>
+                <ReuseButton
+                  variant="secondary"
+                  onClick={() => handleDecline(currentRecord)}
+                >
+                  Decline
+                </ReuseButton>
+              </div>
+            )
+          }
+
         </div>
       </div>
     </Modal>

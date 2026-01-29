@@ -3,6 +3,7 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
+import { Link } from "react-router-dom";
 
 // Define the type for the props
 interface ReportsTableProps {
@@ -34,9 +35,13 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
     },
     {
       title: "Name",
-      dataIndex: "userId",
+      dataIndex: "name",
       key: "name",
-      render: (user: any) => `${user?.name} ${user?.sureName || ""}`,
+    },
+    {
+      title: "Name",
+      dataIndex: "email",
+      key: "email",
     },
     {
       title: "Role",
@@ -49,9 +54,33 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       },
     },
     {
-      title: "Issue",
+      title: "illegal content report",
       dataIndex: "reason",
-      key: "issue",
+      key: "reason",
+      width: 300,
+      render: (reason: string) => <p>{reason?.length > 100 ? `${reason?.slice(0, 100)}...` : reason}</p>
+    },
+    {
+      title: "Has Attachment",
+      dataIndex: "image",
+      key: "image",
+      render: (image: string) => <p>{image?.length > 0 ? "Yes" : "No"}</p>
+
+    },
+    {
+      title: "Website URL",
+      dataIndex: "url",
+      key: "url",
+      render: (url: string) => <Link to={url} target="_blank">{url?.length > 50 ? `${url?.slice(0, 50)}...` : url}</Link>
+
+    },
+    {
+      title: "Message",
+      dataIndex: "message",
+      key: "message",
+      width: 300,
+      render: (message: string) => <p>{message?.length > 100 ? `${message?.slice(0, 100)}...` : message}</p>
+
     },
     {
       title: "Date",

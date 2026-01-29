@@ -31,6 +31,7 @@ interface IStatusHistory {
 
 interface IEventOrder {
   _id: string;
+  title: string;
   orderId: string;
   userId: {
     _id: string;
@@ -59,7 +60,7 @@ interface IEventOrder {
   }; // Assuming this is a service provider ID string
   date: Date;
   orderType: "direct" | "custom"; // The type of the order
-  serviceType: "photography" | "videography"; // Type of service
+  serviceType: "photography" | "videography" | "both"; // Type of service
   location: string; // The location for the order
   time: string; // The time for the order
   price?: number; // Optional, price of the order

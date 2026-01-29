@@ -14,6 +14,7 @@ interface IFeedback {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  adminVerified: string;
   __v: number;
 }
 

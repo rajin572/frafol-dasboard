@@ -4,12 +4,14 @@ import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
 import { IFeedback } from "../../types";
 import { formatDateTime } from "../../utils/dateFormet";
+import { MdDelete } from "react-icons/md";
 
 // Define the type for the props
 interface FeedbackTableProps {
   data: IFeedback[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
   showViewModal: (record: IFeedback) => void; // Function to handle viewing a user
+  showDeleteModal: (record: IFeedback) => void; // Function to handle viewing a user
   setPage?: (page: number) => void; // Function to handle pagination
   page: number;
   total: number;
@@ -20,6 +22,7 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({
   data,
   loading,
   showViewModal,
+  showDeleteModal,
   setPage,
   page = 1,
   total = 0,
@@ -44,7 +47,7 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({
       title: "Role",
       dataIndex: "userId",
       key: "role",
-      render: (_: unknown, record: IFeedback) => record?.userId.role, // Render the role from userId object
+      render: (_: unknown, record: IFeedback) => record?.userId.role ? "Photographer & Videographer" : record?.userId.role, // Render the role from userId object
     },
     // {
     //   title: "Role",
@@ -67,6 +70,12 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({
       render: (createdAt: string) => formatDateTime(createdAt), // Format date
     },
     {
+      title: "Status",
+      dataIndex: "adminVerified", // Assuming "adminVerified" is the date field
+      key: "adminVerified",
+      render: (adminVerified: string) => <p className="capitalize">{adminVerified}</p>, // Format date
+    },
+    {
       title: "Action",
       key: "action",
       render: (_: unknown, record: IFeedback) => (
@@ -78,6 +87,14 @@ const FeedbackTable: React.FC<FeedbackTableProps> = ({
               onClick={() => showViewModal(record)}
             >
               <GoEye style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
+          <Tooltip placement="right" title="View Details">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
+              onClick={() => showDeleteModal(record)}
+            >
+              <MdDelete style={{ fontSize: "24px", color: "red" }} />
             </button>
           </Tooltip>
         </Space>
