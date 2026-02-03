@@ -43,6 +43,7 @@ import PrivacyAndPolicy from "../pages/Common/settings/PrivacyAndPolicy";
 import WebsiteFunctionality from "../pages/Common/settings/WebsiteFunctionality";
 import SearchAlgorithm from "../pages/Common/settings/SearchAlgorithm";
 import AdminAllSubscribe from "../pages/Admin/AdminAllSubscribe";
+import Notifications from "../pages/Common/Notifications";
 
 export const adminPaths = [
   {
@@ -193,8 +194,8 @@ export const adminPaths = [
     children: [
       {
         key: "privacy-policy",
-        path: "documentation/privacy-policy",
-        name: "Privacy Policy",
+        path: "documentation/terms-of-service-marketplace",
+        name: "Terms of Service Marketplace",
         icon: dashboardLogo,
         element: <PrivacyAndPolicy />,
       },
@@ -255,5 +256,10 @@ export const adminPaths = [
     key: "profile",
     name: "Profile",
     icon: settingsLogo,
+  },
+  {
+    path: "notifications",
+    element: <Notifications />,
+    key: "notifications",
   },
 ];

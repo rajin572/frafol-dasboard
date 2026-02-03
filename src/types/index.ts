@@ -10,3 +10,23 @@ export * from "./workshop.type";
 export * from "./eventOrder.type";
 export * from "./gearOrder.type";
 export * from "./interactionManagemen.type";
+
+interface NotificationMessage {
+  fullName: string;
+  image: string;
+  text: string;
+  photos: string[];
+  _id: string;
+}
+
+export interface INotification {
+  _id: string;
+  userId: string;
+  receiverId: string;
+  message: NotificationMessage;
+  type: "DirectBookingRequest" | string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}

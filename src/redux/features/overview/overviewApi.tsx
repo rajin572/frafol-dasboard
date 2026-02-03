@@ -30,6 +30,18 @@ const overviewApi = baseApi.injectEndpoints({
       },
       //   providesTags: [tagTypes.],
     }),
+    getAllNotifications: builder.query({
+      query: ({ page, limit }) => {
+        return {
+          url: `/notifications/my-notifications`,
+          method: "GET",
+          params: {
+            page,
+            limit,
+          },
+        };
+      },
+    }),
   }),
 });
 
@@ -37,4 +49,5 @@ export const {
   useGetStatsQuery,
   useGetMonthlyEarningStatsQuery,
   useGetOrderStatsQuery,
+  useGetAllNotificationsQuery,
 } = overviewApi;

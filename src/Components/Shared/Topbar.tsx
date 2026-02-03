@@ -5,43 +5,21 @@ import { Dropdown } from "antd";
 import { Link } from "react-router-dom";
 import { AllImages } from "../../../public/images/AllImages";
 import { getImageUrl } from "../../helpers/config/envConfig";
-import { useState } from "react";
 import useUserData from "../../hooks/useUserData";
 import { useGetProfileQuery } from "../../redux/features/profile/profileApi";
 import SpinLoader from "../../ui/SpinLoader";
-
-const notifications = [
-  {
-    id: 1,
-    message: "A company added 6 Service Users.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 2,
-    message: "A company added 6 Service Users.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 3,
-    message: "A company added 6 Service Users.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 4,
-    message: "A company added 6 Service Users.",
-    time: "Fri, 12:30pm",
-  },
-  {
-    id: 5,
-    message: "A company added 6 Service Users.",
-    time: "Fri, 12:30pm",
-  },
-];
+import { useGetAllNotificationsQuery } from "../../redux/features/overview/overviewApi";
+import { INotification } from "../../types";
+import { formatDateTime } from "../../utils/dateFormet";
+import { useCallback, useEffect, useState } from "react";
+import { useSocket } from "../../context/socket-context";
+import { toast } from "sonner";
 
 const Topbar = ({ collapsed, setCollapsed }: any) => {
   const serverUrl = getImageUrl();
-  const [open, setOpen] = useState(false);
-  console.log(open);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [allNotifications, setAllNotifications] = useState<INotification[]>([]);
+  const socket = useSocket()?.socket;
 
   const user = useUserData();
   const { data, isFetching } = useGetProfileQuery({});
@@ -63,30 +41,113 @@ const Topbar = ({ collapsed, setCollapsed }: any) => {
   //   );
   // const notificationData = notification?.data?.notifications;
 
+  const { data: notification, isFetching: notificationFetching } =
+    useGetAllNotificationsQuery(
+      {
+        page: 1,
+        limit: 6,
+      }
+    );
+
+  const notificationData: INotification[] = notification?.data?.notifications;
+
+  useEffect(() => {
+    setAllNotifications(notificationData);
+  }, [notificationData]);
+
   const notificationMenu = (
     <div
       className="flex flex-col gap-4 w-full text-center bg-white p-4 rounded-lg"
       style={{ boxShadow: "0px 0px 5px  rgba(0, 0, 0, 0.25)" }}
     >
-      {notifications.map((notification) => (
-        <div className="test-start" key={notification.id}>
-          <div className="flex gap-2">
-            <BellFilled className="!text-secondary-color " />
-            <div className="flex flex-col items-start">
-              <p>{notification.message}</p>
-              <p className="text-gray-400">{notification.time}</p>
-            </div>
-          </div>
+      {notificationFetching ? (
+        <div className="flex justify-center items-center w-80">
+          <SpinLoader />
         </div>
-      ))}
+      ) : (
+        // Ensure allNotifications is an array before iterating
+        Array.isArray(allNotifications) && allNotifications.length > 0 ? (
+          [...allNotifications] // Create a shallow copy
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Sort
+            .slice(0, 6) // Slice the top 6 notifications
+            .map((notification) => (
+              <div className="test-start" key={notification?._id}>
+                <div className="flex gap-2">
+                  <BellFilled className="!text-secondary-color " />
+                  <div className="flex flex-col items-start">
+                    <p>{notification?.message?.text}</p>
+                    <p className="text-gray-400">
+                      {formatDateTime(notification?.createdAt)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))
+        ) : (
+          <div>No notifications available</div> // Fallback message if no notifications are present
+        )
+      )}
       <Link
         to={`/${user?.role}/notifications`}
-        className="w-2/3 mx-auto bg-[#022940] !text-primary-color rounded h-8 py-1"
+        className="w-2/3 mx-auto bg-[#022940] !text-secondary-color rounded !font-semibold !text-base py-1"
       >
         See More
       </Link>
     </div>
   );
+
+
+
+
+
+  const handleNotification = useCallback((notification: any) => {
+
+
+    if (!notification?.message?.text) {
+      setNotificationCount(notification?.unreadCount);
+    } else {
+      const newNotification: INotification = {
+        _id: Math.random().toString(36).substring(2, 9),
+        userId: Math.random().toString(36).substring(2, 9),
+        receiverId: Math.random().toString(36).substring(2, 9),
+        message: notification?.message,
+        type: "",
+        isRead: false,
+        createdAt: notification?.timestamp,
+        updatedAt: notification?.timestamp,
+        __v: 0,
+      }
+      setAllNotifications((prev) => [...prev, newNotification]);
+      setNotificationCount((prev) => prev + 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.on(`notification`, handleNotification);
+
+    return () => {
+      socket.off(`notification`, handleNotification);
+    };
+  }, [socket, handleNotification]);
+
+  const handleResetNotification = async () => {
+    if (notificationCount > 0) {
+      try {
+        socket?.emit("readNotification");
+      } catch (error: any) {
+        toast.error(
+          error?.data?.message || error?.message || "Something went wrong!",
+          { duration: 2000 }
+        );
+      }
+    }
+  };
   return (
     <div className=" mx-auto flex justify-between gap-0 items-center mt-2">
       <div className="flex items-center gap-2 text-primary-color ">
@@ -100,15 +161,19 @@ const Topbar = ({ collapsed, setCollapsed }: any) => {
           overlay={notificationMenu}
           trigger={["hover"]}
           placement="bottomRight"
-          onOpenChange={(open: boolean) => {
-            setOpen(open);
+          onOpenChange={() => {
+            handleResetNotification();
           }}
           className="cursor-pointer"
         >
-          <BellFilled
-            shape="circle"
-            className="bg-primary-color py-[18px] px-2 text-xl rounded-full h-6 font-bold !text-secondary-color "
-          />
+          <div className="relative">
+            <BellFilled
+              shape="circle"
+              className=" text-xl rounded-full h-6 font-bold !text-secondary-color "
+            />
+            <div className="absolute top-2.5 -right-1.5 bg-third-color text-secondary-color rounded-full w-4 h-4 text-xs font-semibold flex justify-center items-center">{notificationCount}</div>
+          </div>
+
         </Dropdown>
         {isFetching ? (
           <div className="px-10 py-4">
