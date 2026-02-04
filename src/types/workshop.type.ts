@@ -21,6 +21,7 @@ interface IWorkshop {
   description: string;
   image: string;
   maxParticipant: number;
+  totalParticipants: number;
   approvalStatus: string;
   isDeleted: boolean;
   createdAt: string;

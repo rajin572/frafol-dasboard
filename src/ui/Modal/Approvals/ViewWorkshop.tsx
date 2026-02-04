@@ -96,7 +96,7 @@ const ViewWorkshop = ({
         <div className="flex items-center gap-2 mt-1">
           <LuUsers className="text-secondary-color text-sm sm:text-base lg:text-lg" />
           <p className="text-xs sm:text-sm lg:text-base font-semibold">
-            {currentRecord?.maxParticipant} participants
+            {currentRecord?.totalParticipants ? currentRecord?.totalParticipants : "Max"} {currentRecord?.maxParticipant} participants
           </p>
         </div>
         <div className="flex items-center gap-2 mt-5 justify-between">

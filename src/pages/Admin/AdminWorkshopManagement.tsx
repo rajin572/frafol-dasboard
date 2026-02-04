@@ -9,6 +9,7 @@ import {
 } from "../../redux/features/workshop/workshopApi";
 import { IWorkshop } from "../../types";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import ViewWorkshopManagementModal from "../../ui/Modal/WrokshopManagement/ViewWorkshopManagementModal";
 
 const AdminWorkshopManagement = () => {
   const [page, setPage] = useState(1);
@@ -29,10 +30,16 @@ const AdminWorkshopManagement = () => {
 
   const total = data?.data?.meta?.total || 0;
 
+  const [isViewModal, setIsViewModal] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
   console.log(searchText);
+
+  const showViewModal = (record: IWorkshop) => {
+    setIsViewModal(true);
+    setCurrentRecord(record);
+  };
 
   const showDeleteModal = (record: IWorkshop) => {
     setCurrentRecord(record);
@@ -40,6 +47,7 @@ const AdminWorkshopManagement = () => {
   };
 
   const handleCancel = () => {
+    setIsViewModal(false);
     setIsDeleteModal(false);
     setCurrentRecord(null);
   };
@@ -76,6 +84,7 @@ const AdminWorkshopManagement = () => {
         data={workshopData}
         loading={isFetching}
         showDeleteModal={showDeleteModal}
+        showViewModal={showViewModal}
         setPage={setPage}
         page={page}
         total={total}
@@ -86,6 +95,11 @@ const AdminWorkshopManagement = () => {
         handleCancel={handleCancel}
         currentRecord={currentRecord}
         handleDelete={handleDelete}
+      />
+      <ViewWorkshopManagementModal
+        isViewModalVisible={isViewModal}
+        handleCancel={handleCancel}
+        currentRecord={currentRecord}
       />
     </div>
   );

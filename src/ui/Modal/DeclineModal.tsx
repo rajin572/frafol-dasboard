@@ -3,6 +3,7 @@ import { Form, Modal } from "antd";
 import ReuseButton from "../Button/ReuseButton";
 import ReusableForm from "../Form/ReuseForm";
 import ReuseInput from "../Form/ReuseInput";
+import { useEffect } from "react";
 
 interface DeclineModalProps<T> {
   isDeclineModalVisible: boolean;
@@ -20,13 +21,25 @@ const DeclineModal: React.FC<DeclineModalProps<any>> = ({
   showInput = true,
 }) => {
   const [form] = Form.useForm();
+
+
+  useEffect(() => {
+    if (!currentRecord) {
+      form.resetFields();
+    }
+  }, [currentRecord, form]);
   //   const [blockUser] = useBlockUserMutation();
+
+  const onCancel = () => {
+    handleCancel();
+    form.resetFields();
+  };
 
   return (
     <Modal
       // title="Confirm Delete"
       open={isDeclineModalVisible}
-      onCancel={handleCancel}
+      onCancel={onCancel}
       okText="Unblock"
       cancelText="Cancel"
       centered
@@ -62,7 +75,7 @@ const DeclineModal: React.FC<DeclineModalProps<any>> = ({
           <ReuseButton
             variant="highlight"
             className="!px-6 !py-5 mr-4 w-fit flex items-center justify-center gap-2"
-            onClick={handleCancel}
+            onClick={onCancel}
           >
             Cancel
           </ReuseButton>

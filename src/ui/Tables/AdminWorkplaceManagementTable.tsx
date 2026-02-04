@@ -1,18 +1,20 @@
 import React from "react";
 import ReuseTable from "../../utils/ReuseTable";
-import { Tooltip } from "antd";
+import { Space, Tooltip } from "antd";
 import { MdDelete } from "react-icons/md";
 import { IWorkshop } from "../../types";
 import { getImageUrl } from "../../helpers/config/envConfig";
 import { AllImages } from "../../../public/images/AllImages";
 import { formatDate, formetTime } from "../../utils/dateFormet";
 import { Link } from "react-router-dom";
+import { GoEye } from "react-icons/go";
 
 // Define the type for the props
 interface AdminWorkplaceManagementTableProps {
   data: IWorkshop[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
   showDeleteModal: (record: IWorkshop) => void; // Function to handle viewing payment details
+  showViewModal: (record: IWorkshop) => void;
   setPage?: (page: number) => void; // Function to handle pagination
   page: number;
   total: number;
@@ -21,7 +23,7 @@ interface AdminWorkplaceManagementTableProps {
 
 const AdminWorkplaceManagementTable: React.FC<
   AdminWorkplaceManagementTableProps
-> = ({ data, loading, setPage, showDeleteModal, page, total, limit }) => {
+> = ({ data, loading, setPage, showDeleteModal, showViewModal, page, total, limit }) => {
   const serverUrl = getImageUrl();
   const columns = [
     {
@@ -65,6 +67,9 @@ const AdminWorkplaceManagementTable: React.FC<
       title: "Description",
       dataIndex: "description",
       key: "description",
+      render: (text: string) => (
+        <p className="line-clamp-2">{text}</p>
+      ),
       width: 300,
     },
     {
@@ -126,7 +131,12 @@ const AdminWorkplaceManagementTable: React.FC<
         ),
     },
     {
-      title: "Participants",
+      title: "Total Participants",
+      dataIndex: "totalParticipants",
+      key: "totalParticipants",
+    },
+    {
+      title: "Max Participants",
       dataIndex: "maxParticipant",
       key: "maxParticipant",
     },
@@ -134,7 +144,15 @@ const AdminWorkplaceManagementTable: React.FC<
       title: "Action",
       key: "action",
       render: (_: unknown, record: IWorkshop) => (
-        <div>
+        <Space>
+          <Tooltip placement="right" title="View Details">
+            <button
+              className="!p-0 !bg-transparent !border-none !text-secondary-color cursor-pointer"
+              onClick={() => showViewModal(record)}
+            >
+              <GoEye style={{ fontSize: "24px" }} />
+            </button>
+          </Tooltip>
           <Tooltip placement="right" title="Delete">
             <button
               className="!p-0 !bg-transparent !border-none !text-error-color"
@@ -146,7 +164,7 @@ const AdminWorkplaceManagementTable: React.FC<
               />
             </button>
           </Tooltip>
-        </div>
+        </Space>
       ),
     },
   ];

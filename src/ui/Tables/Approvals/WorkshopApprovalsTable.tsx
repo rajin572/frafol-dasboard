@@ -43,6 +43,7 @@ const WorkshopApprovalsTable: React.FC<WorkshopApprovalsTableProps> = ({
       key: "mainPrice",
       align: "center",
     },
+    { title: "Max Participant", dataIndex: "maxParticipant", key: "maxParticipant" },
     { title: "VAT (%)", dataIndex: "vatAmount", key: "vatAmount" },
     { title: "Host Name", dataIndex: ["authorId", "name"], key: "authorId" },
     {
