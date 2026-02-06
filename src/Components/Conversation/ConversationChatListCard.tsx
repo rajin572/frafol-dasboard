@@ -30,11 +30,10 @@ const ConversationChatListCard = ({
   return (
     <div
       onClick={() => handleConversationSelect(conversation)}
-      className={`m-1 rounded  border-b border-secondary-color/10 bg-secondary-color/10 text-black ${
-        conversation?.chat?._id === selectedConversation?.chat?._id
-          ? "!bg-secondary-color text-white"
-          : ""
-      }`}
+      className={`m-1 rounded  border-b border-secondary-color/10 bg-secondary-color/10 text-black ${conversation?.chat?._id === selectedConversation?.chat?._id
+        ? "!bg-secondary-color text-white"
+        : ""
+        }`}
     >
       <div className="py-4 px-2 cursor-pointer">
         <div className="flex items-center gap-2">
@@ -60,9 +59,9 @@ const ConversationChatListCard = ({
                       : conversation?.users?.[0]?.petName} */}
                     {conversation?.chat?.users?.[0]?.name?.length > 15
                       ? `${conversation?.chat?.users?.[0]?.name.slice(
-                          0,
-                          15
-                        )}...`
+                        0,
+                        15
+                      )}...`
                       : conversation?.chat?.users?.[0]?.name}
                   </p>
                   {onlineUsers?.includes(

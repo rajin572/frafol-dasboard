@@ -10,6 +10,7 @@ export * from "./workshop.type";
 export * from "./eventOrder.type";
 export * from "./gearOrder.type";
 export * from "./interactionManagemen.type";
+export * from "./communityForum.type";
 
 interface NotificationMessage {
   fullName: string;

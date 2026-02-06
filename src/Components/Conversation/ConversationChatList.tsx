@@ -13,11 +13,14 @@ import {
 } from "../../redux/features/conversation/conversationSlice";
 import { useSocket } from "../../context/socket-context";
 import { IConversation } from "../../types/conversation.type";
+import { BiSolidPlusCircle } from "react-icons/bi";
+import CreateConversationModal from "../../ui/Modal/Conversation/CreateConversationModal";
 
 const ConversationChatList = ({ userData, onlineUsers }: any) => {
   const socket = useSocket()?.socket;
   const dispatch = useAppDispatch();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const seletedConversation = useAppSelector(selectSelectedChatUser);
   const [chatList, setChatList] = useState<IConversation[]>([]);
@@ -130,15 +133,26 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
     setSearchTerm(event.target.value);
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div
-      className={`w-full lg:w-[400px] border-r-2 border-secondary-color/20 overflow-y-auto px-3 ${
-        seletedConversation ? "hidden lg:block" : "block lg:block"
-      }`}
+      className={`w-full lg:w-[400px] border-r-2 border-secondary-color/20 overflow-y-auto px-3 ${seletedConversation ? "hidden lg:block" : "block lg:block"
+        }`}
     >
       <div className="sticky top-0 z-20   py-5 mb-3 !bg-primary-color">
-        <div className=" flex justify-between items-center pe-4  text-base sm:text-xl md:text-2xl lg:text-3xl text-secondary-color font-bold mt-3">
-          Messages
+        <div className=" flex justify-between items-center gap-4 mt-3">
+          <h4 className="text-base sm:text-xl md:text-2xl lg:text-3xl text-secondary-color font-bold ">Messages</h4>
+          <BiSolidPlusCircle
+            className="text-3xl text-secondary-color cursor-pointer"
+            onClick={handleOpenModal}
+          />
         </div>
         <Input
           placeholder="Search Conversations"
@@ -171,6 +185,7 @@ const ConversationChatList = ({ userData, onlineUsers }: any) => {
           </div>
         </div>
       )}
+      <CreateConversationModal isAddModalVisible={isModalOpen} handleCancel={handleCloseModal} />
     </div>
   );
 };

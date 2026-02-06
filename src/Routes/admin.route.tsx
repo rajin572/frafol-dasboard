@@ -44,6 +44,7 @@ import WebsiteFunctionality from "../pages/Common/settings/WebsiteFunctionality"
 import SearchAlgorithm from "../pages/Common/settings/SearchAlgorithm";
 import AdminAllSubscribe from "../pages/Admin/AdminAllSubscribe";
 import Notifications from "../pages/Common/Notifications";
+import CommunityForumManagement from "../pages/Admin/CommunityForumManagement";
 
 export const adminPaths = [
   {
@@ -101,6 +102,13 @@ export const adminPaths = [
     element: <AdminWorkshopManagement />,
     key: "workshop-management",
     name: "Workshop Management",
+    icon: workshopLogo,
+  },
+  {
+    path: "community-forum-management",
+    element: <CommunityForumManagement />,
+    key: "community-forum-management",
+    name: "Forum Management",
     icon: workshopLogo,
   },
   {

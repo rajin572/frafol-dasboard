@@ -3,6 +3,13 @@ import { tagTypes } from "../../tagTypes";
 
 const UsersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getAllTypeOfUsers: builder.query({
+      query: ({ searchTerm }) => ({
+        url: `/chat/all-users?searchTerm=${searchTerm}`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.users],
+    }),
     getAllUsersOverview: builder.query({
       query: () => "/users/stats",
       providesTags: [tagTypes.users],
@@ -49,6 +56,7 @@ const UsersApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetAllTypeOfUsersQuery,
   useGetAllUsersOverviewQuery,
   useGetAllUsersQuery,
   useGetAllPendingProfessionalsQuery,

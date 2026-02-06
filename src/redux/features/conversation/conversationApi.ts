@@ -3,6 +3,14 @@ import { tagTypes } from "../../tagTypes";
 
 const conversationApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
+    createConversation: build.mutation({
+      query: (req) => ({
+        url: `/chat/create`,
+        method: "POST",
+        body: req?.body,
+      }),
+      invalidatesTags: [tagTypes.conversation],
+    }),
     getConversationList: build.query({
       query: ({ page, limit, search }) => {
         return {
@@ -32,6 +40,7 @@ const conversationApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useCreateConversationMutation,
   useGetConversationListQuery,
   useGetConversationMessageListQuery,
 } = conversationApi;
