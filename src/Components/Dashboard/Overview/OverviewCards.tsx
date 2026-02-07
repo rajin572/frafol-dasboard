@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RiShoppingBag2Fill } from "react-icons/ri";
 import { HiUsers } from "react-icons/hi";
-import { MdAttachMoney } from "react-icons/md";
+import { FaEuroSign } from "react-icons/fa6";
 
 const OverviewCards = ({ stats }: any) => {
   const countData = [
@@ -37,7 +37,7 @@ const OverviewCards = ({ stats }: any) => {
       id: 4,
       background: "#ffffff",
       name: "Earrings From Commission",
-      icon: <MdAttachMoney className="size-6 text-secondary-color" />,
+      icon: <FaEuroSign className="size-6 text-secondary-color" />,
       count: `${(stats?.totalCommission || 0).toLocaleString()}€`,
     },
   ];

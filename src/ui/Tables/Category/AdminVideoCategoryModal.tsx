@@ -5,6 +5,7 @@ import ReuseTable from "../../../utils/ReuseTable";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { getImageUrl } from "../../../helpers/config/envConfig";
 import { AllImages } from "../../../../public/images/AllImages";
+import { HolderOutlined } from "@ant-design/icons";
 
 // Define the type for the props
 interface AdminVideoCategoryTableProps {
@@ -16,6 +17,7 @@ interface AdminVideoCategoryTableProps {
   page: number;
   total: number;
   limit: number;
+  onReorder?: (newData: any[]) => void; // New prop for reordering
 }
 
 const AdminVideoCategoryTable: React.FC<AdminVideoCategoryTableProps> = ({
@@ -27,10 +29,25 @@ const AdminVideoCategoryTable: React.FC<AdminVideoCategoryTableProps> = ({
   page,
   total,
   limit,
+  onReorder,
 }) => {
   const serverUrl = getImageUrl();
 
   const columns = [
+    {
+      title: "",
+      key: "drag",
+      width: 50,
+      render: () => (
+        <HolderOutlined
+          style={{
+            cursor: "move",
+            fontSize: "16px",
+            color: "#999",
+          }}
+        />
+      ),
+    },
     {
       title: "UID",
       dataIndex: "id",
@@ -98,7 +115,10 @@ const AdminVideoCategoryTable: React.FC<AdminVideoCategoryTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"id"}
+      keyValue={"_id"}
+      draggable={true}
+      onDragEnd={onReorder}
+
     />
   );
 };

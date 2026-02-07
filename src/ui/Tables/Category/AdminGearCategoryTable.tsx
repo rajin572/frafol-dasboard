@@ -3,6 +3,7 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import ReuseTable from "../../../utils/ReuseTable";
 import { MdDelete, MdEdit } from "react-icons/md";
+import { HolderOutlined } from "@ant-design/icons";
 
 // Define the type for the props
 interface AdminGearCategoryTableProps {
@@ -14,6 +15,8 @@ interface AdminGearCategoryTableProps {
   page: number;
   total: number;
   limit: number;
+  onReorder?: (newData: any[]) => void; // New prop for reordering
+
 }
 
 const AdminGearCategoryTable: React.FC<AdminGearCategoryTableProps> = ({
@@ -25,8 +28,24 @@ const AdminGearCategoryTable: React.FC<AdminGearCategoryTableProps> = ({
   page,
   total,
   limit,
+  onReorder,
+
 }) => {
   const columns = [
+    {
+      title: "",
+      key: "drag",
+      width: 50,
+      render: () => (
+        <HolderOutlined
+          style={{
+            cursor: "",
+            fontSize: "16px",
+            color: "#999",
+          }}
+        />
+      ),
+    },
     {
       title: "UID",
       dataIndex: "id",
@@ -78,7 +97,10 @@ const AdminGearCategoryTable: React.FC<AdminGearCategoryTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"id"}
+      keyValue={"_id"}
+      draggable={true}
+      onDragEnd={onReorder}
+
     />
   );
 };

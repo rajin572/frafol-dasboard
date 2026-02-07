@@ -18,6 +18,13 @@ const settingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.category],
     }),
+    updateCategoryOrder: builder.mutation({
+      query: (req) => ({
+        url: `/category/reorder`,
+        method: "PATCH",
+        body: req.body,
+      }),
+    }),
     updateCategory: builder.mutation({
       query: (req) => ({
         url: `/category/update/${req.params.id}`,
@@ -39,6 +46,7 @@ const settingApi = baseApi.injectEndpoints({
 export const {
   useGetCategoryQuery,
   useAddCategoryMutation,
+  useUpdateCategoryOrderMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } = settingApi;

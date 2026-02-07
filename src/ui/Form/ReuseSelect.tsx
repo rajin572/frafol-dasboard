@@ -61,6 +61,7 @@ const ReuseSelect = ({
           disabled={disabled}
           allowClear={allowClear}
           onChange={onChange}
+          defaultValue={value}
         >
           {options.map((option) => (
             <Option key={option.value} value={option.value}>

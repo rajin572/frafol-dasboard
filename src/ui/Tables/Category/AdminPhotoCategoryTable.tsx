@@ -5,17 +5,20 @@ import ReuseTable from "../../../utils/ReuseTable";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { getImageUrl } from "../../../helpers/config/envConfig";
 import { AllImages } from "../../../../public/images/AllImages";
+import { HolderOutlined } from "@ant-design/icons";
 
-// Define the type for the props
 interface AdminPhotoCategoryTableProps {
-  data: any[]; // Replace `unknown` with the actual type of your data array
+  data: any[];
   loading: boolean;
-  showEditModal: (record: any) => void; // Function to handle viewing a user
-  showDeleteModal: (record: any) => void; // Function to handle viewing a user
-  setPage?: (page: number) => void; // Function to handle pagination
+  showEditModal: (record: any) => void;
+  showDeleteModal: (record: any) => void;
+  setPage?: (page: number) => void;
   page: number;
   total: number;
   limit: number;
+  onReorder?: (newData: any[]) => void; // New prop for reordering
+  draggable?: boolean; // Add this
+
 }
 
 const AdminPhotoCategoryTable: React.FC<AdminPhotoCategoryTableProps> = ({
@@ -27,9 +30,27 @@ const AdminPhotoCategoryTable: React.FC<AdminPhotoCategoryTableProps> = ({
   page,
   total,
   limit,
+  onReorder,
+  draggable = true, // Default to true
+
 }) => {
   const serverUrl = getImageUrl();
+
   const columns = [
+    {
+      title: "",
+      key: "drag",
+      width: 50,
+      render: () => (
+        <HolderOutlined
+          style={{
+            cursor: "move",
+            fontSize: "16px",
+            color: "#999",
+          }}
+        />
+      ),
+    },
     {
       title: "UID",
       dataIndex: "id",
@@ -65,7 +86,6 @@ const AdminPhotoCategoryTable: React.FC<AdminPhotoCategoryTableProps> = ({
       key: "action",
       render: (_: unknown, record: any) => (
         <Space size="middle">
-          {/* View Details Tooltip */}
           <Tooltip placement="right" title="Edit">
             <button
               className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
@@ -97,7 +117,9 @@ const AdminPhotoCategoryTable: React.FC<AdminPhotoCategoryTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"id"}
+      keyValue={"_id"}
+      draggable={draggable} // Use the prop
+      onDragEnd={onReorder}
     />
   );
 };

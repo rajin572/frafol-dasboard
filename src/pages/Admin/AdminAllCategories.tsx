@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import ReuseButton from "../../ui/Button/ReuseButton";
-// import { AllImages } from "../../../public/images/AllImages";
 import ReusableTabs from "../../ui/ReusableTabs";
 import AdminPhotoCategoryTable from "../../ui/Tables/Category/AdminPhotoCategoryTable";
 import AdminVideoCategoryTable from "../../ui/Tables/Category/AdminVideoCategoryModal";
@@ -13,6 +12,7 @@ import AdminEditCategories from "../../ui/Modal/Categories/AdminEditCategories";
 import {
   useDeleteCategoryMutation,
   useGetCategoryQuery,
+  useUpdateCategoryOrderMutation, // Add this mutation
 } from "../../redux/features/category/categoryApi";
 import { Form } from "antd";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
@@ -20,12 +20,11 @@ import tryCatchWrapper from "../../utils/tryCatchWrapper";
 const AdminAllCategories = () => {
   const [form] = Form.useForm();
   const [deleteCategory] = useDeleteCategoryMutation();
+  const [updateCategoryOrder] = useUpdateCategoryOrderMutation(); // Add this
+  const [items, setItems] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<"photoGraphy" | "videoGraphy" | "gear">("photoGraphy");
 
-  const [activeTab, setActiveTab] = useState<
-    "photoGraphy" | "videoGraphy" | "gear"
-  >("photoGraphy");
-
-  const limit = 10;
+  const limit = 99999;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
 
@@ -36,8 +35,8 @@ const AdminAllCategories = () => {
     {
       refetchOnMountOrArgChange:
         activeTab === "photoGraphy" ||
-        activeTab === "videoGraphy" ||
-        activeTab === "gear"
+          activeTab === "videoGraphy" ||
+          activeTab === "gear"
           ? true
           : false,
     }
@@ -45,7 +44,15 @@ const AdminAllCategories = () => {
 
   const categoryData = data?.data;
 
-  const filteredData = categoryData?.filter((item: any) => {
+  console.log(categoryData);
+
+  useEffect(() => {
+    if (categoryData) {
+      setItems(categoryData);
+    }
+  }, [categoryData]);
+
+  const filteredData = items?.filter((item: any) => {
     return item?.title?.toLowerCase().includes(searchText.toLowerCase());
   });
 
@@ -83,6 +90,42 @@ const AdminAllCategories = () => {
 
     if (response?.statusCode === 200) {
       handleCancel();
+    }
+  };
+
+  // Handle reorder with order swap
+  const handleReorder = async (swappedData: any[]) => {
+    console.log("Swapped data:", swappedData);
+
+    // Update local state
+    setItems(swappedData);
+
+    // Prepare data for backend - only send items with updated orders
+    const categories = swappedData.map((item, index) => ({
+      _id: item._id,
+      order: index + 1, // New order based on position (1-indexed)
+    }));
+
+    console.log("Sending to backend:", { categories });
+
+    // Call API to update order
+    try {
+      const response = await tryCatchWrapper(updateCategoryOrder, {
+        body: {
+          categories: categories,
+          type: activeTab, // Send the category type
+        },
+      });
+
+      if (response?.statusCode === 200) {
+        console.log("Order updated successfully");
+      }
+    } catch (error) {
+      console.error("Failed to update order:", error);
+      // Optionally revert the changes if API fails
+      if (categoryData) {
+        setItems(categoryData);
+      }
     }
   };
 
@@ -125,6 +168,7 @@ const AdminAllCategories = () => {
                 page={page}
                 total={filteredData?.length}
                 limit={limit}
+                onReorder={handleReorder}
               />
             ),
           },
@@ -141,6 +185,7 @@ const AdminAllCategories = () => {
                 page={page}
                 total={filteredData?.length}
                 limit={limit}
+                onReorder={handleReorder}
               />
             ),
           },
@@ -157,6 +202,7 @@ const AdminAllCategories = () => {
                 page={page}
                 total={filteredData?.length}
                 limit={limit}
+                onReorder={handleReorder}
               />
             ),
           },
@@ -166,7 +212,7 @@ const AdminAllCategories = () => {
           setActiveTab(tab);
           setSearchText("");
           form.resetFields();
-          setPage(1); // Reset page when changing tabs
+          setPage(1);
         }}
       />
 

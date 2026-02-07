@@ -112,7 +112,7 @@ const CommunityForumManagementTable: React.FC<
                             <GoEye style={{ fontSize: "24px" }} />
                         </button>
                     </Tooltip>
-                    <Tooltip placement="right" title="View Details">
+                    <Tooltip placement="right" title="Delete">
                         <button
                             className="!p-0 !bg-transparent !border-none !text-error cursor-pointer"
                             onClick={() => showDeleteModal(record)}

@@ -15,6 +15,8 @@ const Bar_Chart = ({
 }: {
   monthlyCommission: { month: string; totalCommission: number }[];
 }) => {
+
+  const max = monthlyCommission?.reduce((max, data) => Math.max(max, data?.totalCommission), 0);
   // Custom tooltip to display the information
 
   // Custom tick style for X and Y axes
@@ -58,12 +60,10 @@ const Bar_Chart = ({
             tickMargin={16}
           />
           {/* Add several horizontal black lines using ReferenceLine */}
-          <ReferenceLine y={10} stroke="#20202055" />
-          <ReferenceLine y={20} stroke="#20202055" />
-          <ReferenceLine y={30} stroke="#20202055" />
-          <ReferenceLine y={40} stroke="#20202055" />
-          <ReferenceLine y={50} stroke="#20202055" />
-          <ReferenceLine y={60} stroke="#20202055" />
+          <ReferenceLine y={max * 0.2} stroke="#20202055" strokeDasharray="3 3" />
+          <ReferenceLine y={max * 0.4} stroke="#20202055" strokeDasharray="3 3" />
+          <ReferenceLine y={max * 0.6} stroke="#20202055" strokeDasharray="3 3" />
+          <ReferenceLine y={max * 0.8} stroke="#20202055" strokeDasharray="3 3" />
           <Bar
             dataKey="totalCommission"
             fill="url(#incomeGradient)" // Bar color
