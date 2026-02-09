@@ -5,12 +5,13 @@ import { getBaseUrl } from "../../helpers/config/envConfig";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: getBaseUrl(),
+  timeout: 60000,
   credentials: "include",
   prepareHeaders: (headers) => {
     const token = Cookies.get("frafoldashboard_accessToken");
     const resendOtptoken = Cookies.get("frafoldashboard_forgetToken");
     const resetPasswordToken = Cookies.get(
-      "frafoldashboard_forgetOtpMatchToken"
+      "frafoldashboard_forgetOtpMatchToken",
     );
 
     if (token) {

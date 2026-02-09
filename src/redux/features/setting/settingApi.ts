@@ -12,6 +12,7 @@ const settingApi = baseApi.injectEndpoints({
     }),
     updateSetting: builder.mutation({
       query: (data) => {
+        console.log(data);
         return {
           url: `/settings`,
           method: "PUT",
