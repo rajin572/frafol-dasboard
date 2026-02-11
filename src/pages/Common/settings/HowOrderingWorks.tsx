@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import JoditEditor from "jodit-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import ReuseButton from "../../../ui/Button/ReuseButton";
 import {
   useGetSettingQuery,
@@ -8,10 +7,10 @@ import {
 } from "../../../redux/features/setting/settingApi";
 import { toast } from "sonner";
 import Loading from "../../../ui/Loading";
+import RichTextEditor from "../../../Components/Shared/RichTextEditor";
 
 const HowOrderingWorks = () => {
   const [addStaticContent] = useUpdateSettingMutation();
-  const editor = useRef(null);
   const [content, setContent] = useState("");
 
   const { data, isFetching } = useGetSettingQuery("howOrderingWorks");
@@ -54,14 +53,13 @@ const HowOrderingWorks = () => {
       </div>
       <div className=" flex justify-center items-center">
         <div className="w-[95%]">
-          <div className=" mb-10">
-            <JoditEditor
-              ref={editor}
-              value={content}
-              config={{ height: 500, theme: "light", readonly: false }}
-              onBlur={(newContent) => setContent(newContent)}
-            />
-          </div>
+          <RichTextEditor
+            content={content}
+            setContent={setContent}
+            placeholder="Type something amazing..."
+            minHeight="500px"
+          />
+
           <ReuseButton variant="secondary" onClick={handleOnSave}>
             Save
           </ReuseButton>

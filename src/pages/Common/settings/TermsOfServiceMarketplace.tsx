@@ -9,13 +9,11 @@ import { toast } from "sonner";
 import Loading from "../../../ui/Loading";
 import RichTextEditor from "../../../Components/Shared/RichTextEditor";
 
-const TermsOfService = () => {
+const TermsOfServiceMarketplace = () => {
   const [addStaticContent] = useUpdateSettingMutation();
   const [content, setContent] = useState("");
 
-  const { data, isFetching } = useGetSettingQuery("termsService");
-
-  console.log(data)
+  const { data, isFetching } = useGetSettingQuery("privacyPolicy");
 
   useEffect(() => {
     if (data) {
@@ -25,10 +23,9 @@ const TermsOfService = () => {
 
   const handleOnSave = async () => {
     const data = {
-      key: "termsService",
+      key: "privacyPolicy",
       content,
     };
-
     const toastId = toast.loading("Updating ...");
 
     try {
@@ -47,13 +44,11 @@ const TermsOfService = () => {
     return <Loading />;
   }
 
-  console.log(content)
-
   return (
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mx-3 py-2 mb-5">
         <p className="text-xl sm:text-2xl lg:text-3xl text-base-color font-bold ">
-          Terms of Service Conceptural
+          Terms of Service Marketplace
         </p>
       </div>
       <div className=" flex justify-center items-center">
@@ -73,4 +68,4 @@ const TermsOfService = () => {
     </div>
   );
 };
-export default TermsOfService;
+export default TermsOfServiceMarketplace;

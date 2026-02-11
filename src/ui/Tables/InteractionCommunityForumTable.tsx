@@ -16,6 +16,34 @@ interface InteractionCommunityForumTableProps {
   limit: number;
 }
 
+const stripHtmlTags = (html: string): string => {
+  if (!html) return '';
+
+  try {
+    // Remove style tags and their content
+    let text = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+
+    // Remove script tags and their content
+    text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+
+    // Remove all HTML tags
+    text = text.replace(/<[^>]+>/g, '');
+
+    // Decode HTML entities
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    text = textarea.value;
+
+    // Remove extra whitespace and newlines
+    text = text.replace(/\s+/g, ' ').trim();
+
+    return text;
+  } catch (error) {
+    console.error('Error stripping HTML:', error);
+    return '';
+  }
+};
+
 const InteractionCommunityForumTable: React.FC<
   InteractionCommunityForumTableProps
 > = ({ data, loading, showViewModal, setPage, page = 1, total = 0, limit }) => {
@@ -49,11 +77,24 @@ const InteractionCommunityForumTable: React.FC<
     },
     {
       title: "Content",
-      dataIndex: "text", // Render content or feedback from the record
+      dataIndex: "text",
       key: "text",
-      render: (text: string) => (
-        <p>{text.length > 50 ? `${text.substring(0, 50)}...` : text}</p>
-      ), // Truncate if the content is too long
+      width: 300,
+      render: (text: string) => {
+        // Strip HTML tags and get plain text
+        const plainText = stripHtmlTags(text);
+
+        // If still empty after stripping, return N/A
+        if (!plainText || plainText.trim() === '') {
+          return "N/A";
+        }
+
+        return (
+          <div className="line-clamp-2">
+            {plainText}
+          </div>
+        );
+      },
     },
     {
       title: "Date",
@@ -71,8 +112,8 @@ const InteractionCommunityForumTable: React.FC<
             approvalStatus === "approved"
               ? "text-green-500"
               : approvalStatus === "rejected"
-              ? "text-red-500"
-              : "text-yellow-500"
+                ? "text-red-500"
+                : "text-yellow-500"
           }
         >
           {approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}

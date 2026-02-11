@@ -23,11 +23,10 @@ import AdminAllTransaction from "../pages/Admin/AdminAllTransaction";
 import AdminAllReports from "../pages/Admin/AdminAllReports";
 import AdminCommissionSetupPage from "../pages/Admin/AdminCommissionSetupPage";
 import AdminAllFeedback from "../pages/Admin/AdminAllFeedback";
-import TermsOfService from "../pages/Common/settings/TermsOfService";
 import GDPR from "../pages/Common/settings/GDPR";
 import HowOrderingWorks from "../pages/Common/settings/HowOrderingWorks";
 import HowItWorks from "../pages/Common/settings/HowItWorks";
-import FrameworkAgreement from "../pages/Common/settings/FrameworkAgreement";
+// import FrameworkAgreement from "../pages/Common/settings/FrameworkAgreement";
 import ProfileSettingsPage from "../pages/Common/settings/Profile";
 import AdminAllCategories from "../pages/Admin/AdminAllCategories";
 import AdminOrderManagement from "../pages/Admin/AdminOrderManagement";
@@ -39,12 +38,13 @@ import InteractionMessages from "../pages/Admin/InteractionManagement/Interactio
 import InteractionCommunityForum from "../pages/Admin/InteractionManagement/InteractionCommunityForum";
 import AdminAllCupon from "../pages/Admin/AdminAllCupon";
 import AdminChoiceManagement from "../pages/Admin/AdminChoiceManagement";
-import PrivacyAndPolicy from "../pages/Common/settings/PrivacyAndPolicy";
 import WebsiteFunctionality from "../pages/Common/settings/WebsiteFunctionality";
 import SearchAlgorithm from "../pages/Common/settings/SearchAlgorithm";
 import AdminAllSubscribe from "../pages/Admin/AdminAllSubscribe";
 import Notifications from "../pages/Common/Notifications";
 import CommunityForumManagement from "../pages/Admin/CommunityForumManagement";
+import TermsOfServiceConceptural from "../pages/Common/settings/TermsOfServiceConceptural";
+import TermsOfServiceMarketplace from "../pages/Common/settings/TermsOfServiceMarketplace";
 
 export const adminPaths = [
   {
@@ -201,18 +201,18 @@ export const adminPaths = [
     icon: documentationLogo,
     children: [
       {
-        key: "privacy-policy",
+        key: "terms-of-service-marketplace",
         path: "documentation/terms-of-service-marketplace",
         name: "Terms of Service Marketplace",
         icon: dashboardLogo,
-        element: <PrivacyAndPolicy />,
+        element: <TermsOfServiceMarketplace />,
       },
       {
         key: "terms-of-service",
         path: "documentation/terms-of-service",
-        name: "Terms of Service",
+        name: "Terms of Service Conceptural",
         icon: dashboardLogo,
-        element: <TermsOfService />,
+        element: <TermsOfServiceConceptural />,
       },
       {
         key: "gdpr",
@@ -220,6 +220,20 @@ export const adminPaths = [
         name: "GDPR",
         icon: dashboardLogo,
         element: <GDPR />,
+      },
+      {
+        key: "website-functionality-and-compatibility",
+        path: "documentation/website-functionality-and-compatibility",
+        name: "Website Functionality & Compatibility",
+        icon: dashboardLogo,
+        element: <WebsiteFunctionality />,
+      },
+      {
+        key: "search-algorithm",
+        path: "documentation/search-algorithm",
+        name: "Search Algorithm",
+        icon: dashboardLogo,
+        element: <SearchAlgorithm />,
       },
       {
         key: "how-ordering-works",
@@ -235,27 +249,13 @@ export const adminPaths = [
         icon: dashboardLogo,
         element: <HowItWorks />,
       },
-      {
-        key: "framework-agreement",
-        path: "documentation/framework-agreement",
-        name: "Framework Agreement",
-        icon: dashboardLogo,
-        element: <FrameworkAgreement />,
-      },
-      {
-        key: "search-algorithm",
-        path: "documentation/search-algorithm",
-        name: "Search Algorithm",
-        icon: dashboardLogo,
-        element: <SearchAlgorithm />,
-      },
-      {
-        key: "website-functionality-and-compatibility",
-        path: "documentation/website-functionality-and-compatibility",
-        name: "Website Functionality",
-        icon: dashboardLogo,
-        element: <WebsiteFunctionality />,
-      },
+      // {
+      //   key: "framework-agreement",
+      //   path: "documentation/framework-agreement",
+      //   name: "Framework Agreement",
+      //   icon: dashboardLogo,
+      //   element: <FrameworkAgreement />,
+      // },
     ],
   },
   {
