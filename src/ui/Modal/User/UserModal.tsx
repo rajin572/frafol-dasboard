@@ -5,6 +5,7 @@ import { FaStar } from "react-icons/fa";
 import ReuseButton from "../../Button/ReuseButton";
 import { IUser } from "../../../types";
 import { getImageUrl } from "../../../helpers/config/envConfig";
+import { formatDate } from "../../../utils/dateFormet";
 interface UserModalProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
@@ -75,61 +76,89 @@ const UserModal: React.FC<UserModalProps> = ({
               </div>
             )}
           </div>
-          {activeTab === "professional" && (
-            <div className="">
-              <p className="text-sm sm:text-base lg:text-lg mt-1">
-                {currentRecord?.profileId?.about}
-              </p>
-            </div>
-          )}
 
           <div className="mt-5">
             {activeTab === "professional" ? (
-              <div className="text-lg grid grid-cols-1 bg-secondary-color/5 p-3 rounded lg:grid-cols-2 mt-3">
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Email:</span>
-                  <span>{currentRecord?.email}</span>
+              <div className="">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-5">
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Email:</span>{" "}
+                    {currentRecord?.email}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Phone Number:</span>{" "}
+                    {currentRecord?.phone}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Date of Birth:</span>{" "}
+                    {formatDate(currentRecord?.dateOfBirth)}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">
+                      Company Name:
+                    </span>{" "}
+                    {currentRecord?.companyName}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Address:</span>{" "}
+                    {currentRecord?.address}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Country:</span>{" "}
+                    {currentRecord?.country}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Town:</span>{" "}
+                    {currentRecord?.town}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">Zip Code:</span>{" "}
+                    {currentRecord?.zipCode}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">ICO:</span>{" "}
+                    {currentRecord?.ico}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">DIC:</span>{" "}
+                    {currentRecord?.dic}
+                  </div>
+                  <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+                    <span className="font-semibold text-secondary-color">IC DPH:</span>{" "}
+                    {currentRecord?.ic_dph}
+                  </div>
                 </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Phone:</span>
-                  <span>{currentRecord?.phone}</span>
+
+                <div className="mt-3">
+                  <div className="text-lg  ">
+                    <span className="font-medium text-secondary-color">About:</span>
+                    <div className="text-sm sm:text-base lg:text-lg text-base-color mt-1 p-2 bg-gray-100 rounded-md">
+                      <span>
+                        {currentRecord?.profileId?.about}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Hourly Rate:</span>
-                  <span>{currentRecord?.minHourlyRate}€ - {currentRecord?.maxHourlyRate}€</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Location:</span>
-                  <span>{currentRecord?.address}</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Town:</span>
-                  <span>{currentRecord?.town}</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Country:</span>
-                  <span>{currentRecord?.country}</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">Zip Code:</span>
-                  <span>{currentRecord?.zipCode}</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">ICO:</span>
-                  <span>{currentRecord?.ico}</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">DIC:</span>
-                  <span>{currentRecord?.dic}</span>
-                </div>
-                <div className="flex items-center  gap-2 mb-2">
-                  <span className="font-medium">IC DPH:</span>
-                  <span>{currentRecord?.ic_dph}</span>
+                <div className="mt-3">
+                  <div className="text-lg flex items-center justify-start gap-2">
+                    <span className="font-medium text-secondary-color">
+                      Hourly Rate:
+                    </span>
+                    <span className="text-sm sm:text-base lg:text-lg text-secondary-color mt-1 p-1.5 bg-gray-100 rounded-md font-extrabold">
+                      {currentRecord
+                        ? ` ${currentRecord.minHourlyRate}€ - ${currentRecord.maxHourlyRate}€`
+                        : "N/A"}
+                    </span>
+                  </div>
                 </div>
               </div>
             ) : (
               <div className="text-lg  mt-3">
                 <div className="text-lg grid grid-cols-1 bg-secondary-color/5 p-3 rounded lg:grid-cols-2 mt-3">
+                  <div className="flex items-center  gap-2 mb-2">
+                    <span className="font-medium">Company Name:</span>
+                    <span>{currentRecord?.companyName}</span>
+                  </div>
                   <div className="flex items-center  gap-2 mb-2">
                     <span className="font-medium">Email:</span>
                     <span>{currentRecord?.email}</span>
@@ -137,6 +166,10 @@ const UserModal: React.FC<UserModalProps> = ({
                   <div className="flex items-center  gap-2 mb-2">
                     <span className="font-medium">Phone:</span>
                     <span>{currentRecord?.phone}</span>
+                  </div>
+                  <div className="flex items-center  gap-2 mb-2">
+                    <span className="font-medium">Date of Birth:</span>
+                    <span>{formatDate(currentRecord?.dateOfBirth)}</span>
                   </div>
                   <div className="flex items-center  gap-2 mb-2">
                     <span className="font-medium">Location:</span>

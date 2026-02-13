@@ -5,6 +5,8 @@ interface IProfessional {
     about: string;
   };
   name: string;
+  phone: string;
+  dateOfBirth: string;
   sureName: string;
   companyName: string;
   email: string;
@@ -14,6 +16,7 @@ interface IProfessional {
   address: string;
   town: string;
   country: string;
+  zipCode: string;
   hourlyRate: number;
   maxHourlyRate: number;
   minHourlyRate: number;

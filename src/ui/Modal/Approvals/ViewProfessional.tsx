@@ -2,6 +2,7 @@
 import ReuseButton from "../../Button/ReuseButton";
 import { IProfessional } from "../../../types";
 import { AllImages } from "../../../../public/images/AllImages";
+import { formatDate } from "../../../utils/dateFormet";
 
 const professionalInitialValues: IProfessional = {
   _id: "",
@@ -10,6 +11,8 @@ const professionalInitialValues: IProfessional = {
     about: "",
   },
   name: "",
+  phone: "",
+  dateOfBirth: "",
   sureName: "",
   companyName: "",
   email: "",
@@ -19,6 +22,7 @@ const professionalInitialValues: IProfessional = {
   address: "",
   town: "",
   country: "",
+  zipCode: "",
   hourlyRate: 0,
   ico: "",
   dic: "",
@@ -76,6 +80,14 @@ const ViewProfessional = ({
             {currentRecord?.email}
           </div>
           <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+            <span className="font-semibold text-secondary-color">Phone Number:</span>{" "}
+            {currentRecord?.phone}
+          </div>
+          <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+            <span className="font-semibold text-secondary-color">Date of Birth:</span>{" "}
+            {formatDate(currentRecord?.dateOfBirth)}
+          </div>
+          <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
             <span className="font-semibold text-secondary-color">
               Company Name:
             </span>{" "}
@@ -92,6 +104,10 @@ const ViewProfessional = ({
           <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
             <span className="font-semibold text-secondary-color">Town:</span>{" "}
             {currentRecord?.town}
+          </div>
+          <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
+            <span className="font-semibold text-secondary-color">Zip Code:</span>{" "}
+            {currentRecord?.zipCode}
           </div>
           <div className="text-xs sm:text-sm lg:text-base font-medium flex items-center gap-1">
             <span className="font-semibold text-secondary-color">ICO:</span>{" "}
