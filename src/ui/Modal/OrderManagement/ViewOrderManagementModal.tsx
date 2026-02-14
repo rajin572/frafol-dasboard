@@ -26,6 +26,9 @@ const ViewOrderManagementModal: React.FC<ViewOrderManagementModalProps> = ({
 }) => {
   const serverUrl = getImageUrl();
 
+
+  console.log(currentRecord)
+
   const handleProfessionalInvoiceDownload = (currentRecord: IEventOrder) => {
     const toastId = toast.loading("Downloading...", {
       duration: 2000,

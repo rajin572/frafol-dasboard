@@ -34,6 +34,18 @@ const AdminAllDeliveryManagementTable: React.FC<
         record?.userId?.name || "N/A",
     },
     {
+      title: "Bank Name",
+      dataIndex: ["serviceProviderId", "profileId", "bankName"],
+      key: "bankName",
+      // render: (_: unknown, record: IDeliveryManagement) =>
+      //   record?.serviceProviderId?.name || "N/A",
+    },
+    {
+      title: "Bank Account Number",
+      dataIndex: ["serviceProviderId", "profileId", "accountNumber"],
+      key: "photographer_videographer",
+    },
+    {
       title: "Photographer/Videographer",
       dataIndex: "serviceProviderId",
       key: "photographer_videographer",
@@ -65,9 +77,8 @@ const AdminAllDeliveryManagementTable: React.FC<
       key: "deliveryStatus",
       render: (status: string) => (
         <span
-          className={`${
-            status === "delivered" ? "text-success" : "text-warning"
-          } font-semibold`}
+          className={`${status === "delivered" ? "text-success" : "text-warning"
+            } font-semibold`}
         >
           {status.charAt(0).toUpperCase() + status.slice(1)}
         </span>
@@ -79,9 +90,8 @@ const AdminAllDeliveryManagementTable: React.FC<
       key: "paymentStatus",
       render: (status: string) => (
         <span
-          className={`${
-            status === "Paid" ? "text-success" : "text-error"
-          } font-semibold`}
+          className={`${status === "Paid" ? "text-success" : "text-error"
+            } font-semibold`}
         >
           {status}
         </span>
@@ -96,7 +106,7 @@ const AdminAllDeliveryManagementTable: React.FC<
             <Tooltip placement="right" title="Make Payment">
               <ReuseButton
                 variant="secondary"
-                className="!p-0 !bg-warning !border-none !text-primary-color cursor-pointer !w-full !text-sm"
+                className="!p-1 !bg-warning !border-none !text-primary-color cursor-pointer !w-full !text-sm"
                 onClick={() => showViewPaymentModal(record)}
               >
                 Make Payment
@@ -105,7 +115,7 @@ const AdminAllDeliveryManagementTable: React.FC<
           ) : (
             <ReuseButton
               variant="outline"
-              className="!p-0  !border !border-success !text-success !cursor-default !w-full !text-sm"
+              className="!p-1  !border !border-success !text-success !cursor-default !w-full !text-sm"
             >
               Paid
             </ReuseButton>

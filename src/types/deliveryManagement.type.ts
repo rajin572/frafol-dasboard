@@ -3,6 +3,17 @@ interface IUserBasic {
   name: string;
   email: string;
   profileImage?: string;
+  profileId: {
+    _id: string;
+    about: string;
+    acceptTerms: boolean;
+    ramcuvaAgree: boolean;
+    bankName: string;
+    accountNumber: string;
+    routingNumber: string;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
 interface IStatusTimestamps {
