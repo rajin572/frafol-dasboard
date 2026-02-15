@@ -17,6 +17,7 @@ type TSelectProps = {
   value?: any;
   onChange?: (value: any) => void;
   allowClear?: boolean;
+  showSearch?: boolean;
   mode?: "multiple" | undefined;
   wrapperClassName?: string;
   labelClassName?: string;
@@ -34,6 +35,7 @@ const ReuseSelect = ({
   value,
   onChange,
   allowClear = false,
+  showSearch = false,
   mode,
   wrapperClassName,
   labelClassName,
@@ -51,9 +53,10 @@ const ReuseSelect = ({
       )}
       <Form.Item name={name} rules={rules}>
         <Select
+          showSearch={showSearch}
           mode={mode}
           className={cn(
-            "!h-10  !text-base-color !placeholder:text-[##B5B5B5] border !border-primary-color !ring-0 rounded-md ",
+            "!min-h-10 overflow-y-auto  !text-base-color !placeholder:text-[#B5B5B5] border !border-primary-color !ring-0 rounded-md ",
             selectClassName
           )}
           value={value}
@@ -61,7 +64,6 @@ const ReuseSelect = ({
           disabled={disabled}
           allowClear={allowClear}
           onChange={onChange}
-          defaultValue={value}
         >
           {options.map((option) => (
             <Option key={option.value} value={option.value}>
