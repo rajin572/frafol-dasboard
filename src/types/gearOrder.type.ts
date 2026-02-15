@@ -1,14 +1,25 @@
 interface Client {
-  _id: string;
   name: string;
+  companyName: string;
+  _id: string;
   email: string;
+  phone: string;
+  address: string;
+  ico: string;
+  dic: string;
+  ic_dph: string;
   profileImage: string;
 }
-
 interface Seller {
   _id: string;
   name: string;
+  companyName: string;
   email: string;
+  address: string;
+  phone: string;
+  ico: string;
+  dic: string;
+  ic_dph: string;
   profileImage: string;
 }
 
@@ -55,6 +66,13 @@ interface IGearOrder {
   ico: string;
   dic: string;
   ic_dph: string;
+  statusTimestamps: {
+    createdAt: string;
+    deliveryRequestAt: string;
+    deliveryRequestDeclineAt: string | null;
+    deliveredAt: string;
+    cancelledAt: string | null;
+  };
   companyAddress: string;
   deliveryNote: string;
   isDeleted: boolean;

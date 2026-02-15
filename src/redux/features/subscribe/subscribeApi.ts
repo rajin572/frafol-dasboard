@@ -9,7 +9,14 @@ const subscribeApi = baseApi.injectEndpoints({
         params: { page, limit },
       }),
     }),
+    sendEmail: builder.mutation({
+      query: (req) => ({
+        url: `/subscribe/send-email`,
+        method: "POST",
+        body: req.body,
+      }),
+    }),
   }),
 });
 
-export const { useGetSubscribeQuery } = subscribeApi;
+export const { useGetSubscribeQuery, useSendEmailMutation } = subscribeApi;
