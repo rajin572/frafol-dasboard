@@ -45,6 +45,7 @@ import Notifications from "../pages/Common/Notifications";
 import CommunityForumManagement from "../pages/Admin/CommunityForumManagement";
 import TermsOfServiceConceptural from "../pages/Common/settings/TermsOfServiceConceptural";
 import TermsOfServiceMarketplace from "../pages/Common/settings/TermsOfServiceMarketplace";
+import AdminAllTown from "../pages/Admin/AdminAllTown";
 
 export const adminPaths = [
   {
@@ -123,6 +124,13 @@ export const adminPaths = [
     element: <AdminAllCategories />,
     key: "categories",
     name: "Categories",
+    icon: categoryLogo,
+  },
+  {
+    path: "towns",
+    element: <AdminAllTown />,
+    key: "towns",
+    name: "Towns",
     icon: categoryLogo,
   },
   {

@@ -1,17 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
-import { IInsurance } from "../../types";
 import { formatDateTime } from "../../utils/dateFormet";
 import { getImageUrl } from "../../helpers/config/envConfig";
 import { AllImages } from "../../../public/images/AllImages";
 
 // Define the type for the props
 interface AdminAllInsuranceTableProps {
-  data: IInsurance[]; // Replace `unknown` with the actual type of your data array
+  data: any[]; // Replace `unknown` with the actual type of your data array
   loading: boolean;
-  showViewModal: (record: IInsurance) => void; // Function to handle viewing a user
+  showViewModal: (record: any) => void; // Function to handle viewing a user
   setPage?: (page: number) => void; // Function to handle pagination
   page: number;
   total: number;
@@ -40,7 +40,7 @@ const AdminAllInsuranceTable: React.FC<AdminAllInsuranceTableProps> = ({
       title: "Registered By",
       dataIndex: "userId",
       key: "userId",
-      render: (_: unknown, record: IInsurance) => (
+      render: (_: unknown, record: any) => (
         <div className="flex items-center gap-2">
           <img
             src={
@@ -61,7 +61,7 @@ const AdminAllInsuranceTable: React.FC<AdminAllInsuranceTableProps> = ({
       title: "Full Name",
       dataIndex: "fullName", // Assuming "fullName" contains user info
       key: "fullName",
-      render: (_: unknown, record: IInsurance) =>
+      render: (_: unknown, record: any) =>
         `${record?.userId.name} ${record?.userId.sureName}`, // Render user name and surname
     },
     {
@@ -83,7 +83,7 @@ const AdminAllInsuranceTable: React.FC<AdminAllInsuranceTableProps> = ({
     {
       title: "Action",
       key: "action",
-      render: (_: unknown, record: IInsurance) => (
+      render: (_: unknown, record: any) => (
         <Space size="middle">
           {/* View Details Tooltip */}
           <Tooltip placement="right" title="View Details">

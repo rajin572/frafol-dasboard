@@ -18,6 +18,7 @@ export const tagTypes = {
   interactionManagement: "InteractionManagement",
   coupon: "Coupon",
   subscription: "Subscription",
+  town: "Town",
 };
 
 export const tagTypesList = [
@@ -40,4 +41,5 @@ export const tagTypesList = [
   tagTypes.report,
   tagTypes.coupon,
   tagTypes.subscription,
+  tagTypes.town,
 ];

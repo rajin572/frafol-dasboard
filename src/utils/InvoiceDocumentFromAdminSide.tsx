@@ -13,8 +13,8 @@ import { AllImages } from "../../public/images/AllImages";
 import { formatDate } from "./dateFormet";
 
 Font.register({
-  family: "Roboto",
-  src: "https://fonts.googleapis.com/css2?family=Playwrite+SK:wght@100..400&display=swap",
+  family: "PlaywriteSK",
+  src: "/fonts/PlaywriteSK-Regular.ttf",
 });
 
 // Create styles for the PDF using @react-pdf/renderer's StyleSheet
@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: "#efefef",
     padding: 30,
+    fontFamily: "PlaywriteSK", // optional global
   },
   header: {
     fontSize: 18,
