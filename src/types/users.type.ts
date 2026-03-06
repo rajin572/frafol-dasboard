@@ -39,5 +39,6 @@ export interface IUser {
   zipCode: string;
   introVideo: string;
   bannerImages: string[];
+  travelTowns: string[];
   dateOfBirth: string;
 }

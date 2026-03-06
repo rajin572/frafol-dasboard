@@ -40,6 +40,7 @@ const professionalInitialValues: IProfessional = {
   createdAt: "",
   updatedAt: "",
   galery: [],
+  travelTowns: [],
 };
 
 const ViewProfessional = ({
@@ -51,6 +52,7 @@ const ViewProfessional = ({
   showDeclineModal: (record: any) => void;
   currentRecord: IProfessional;
 }) => {
+  console.log("currentRecord", currentRecord);
   return (
     <div className="p-5">
       <div className="">
@@ -122,6 +124,28 @@ const ViewProfessional = ({
             {currentRecord?.ic_dph}
           </div>
         </div>
+
+        {currentRecord?.travelTowns?.length > 0 && (
+          <div className="text-lg my-5">
+            <span className="font-medium text-secondary-color">
+              Travel Towns:
+            </span>
+            <ul className="text-sm sm:text-base lg:text-lg text-base-color mt-1 p-2 bg-gray-100 rounded-md flex items-center flex-wrap gap-3">
+              {currentRecord.travelTowns.map(
+                (specialization, index) => (
+                  <li
+                    key={index}
+                    className="list-none list-inside text-secondary-color"
+                  >
+                    <span className="text-base-color capitalize">
+                      {specialization},
+                    </span>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+        )}
 
         {currentRecord?.photographerSpecializations?.length > 0 && (
           <div className="text-lg my-5">

@@ -128,7 +128,27 @@ const UserModal: React.FC<UserModalProps> = ({
                     {currentRecord?.ic_dph}
                   </div>
                 </div>
-
+                {currentRecord?.travelTowns?.length as number > 0 && (
+                  <div className="text-lg my-5">
+                    <span className="font-medium text-secondary-color">
+                      Travel Towns:
+                    </span>
+                    <ul className="text-sm sm:text-base lg:text-lg text-base-color mt-1 p-2 bg-gray-100 rounded-md flex items-center flex-wrap gap-3">
+                      {currentRecord?.travelTowns?.map(
+                        (specialization, index) => (
+                          <li
+                            key={index}
+                            className="list-none list-inside text-secondary-color"
+                          >
+                            <span className="text-base-color capitalize">
+                              {specialization},
+                            </span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
                 <div className="mt-3">
                   <div className="text-lg  ">
                     <span className="font-medium text-secondary-color">About:</span>

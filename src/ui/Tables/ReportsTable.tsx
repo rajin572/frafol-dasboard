@@ -39,7 +39,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       key: "name",
     },
     {
-      title: "Name",
+      title: "Email",
       dataIndex: "email",
       key: "email",
     },

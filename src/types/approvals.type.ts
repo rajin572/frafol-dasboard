@@ -33,7 +33,8 @@ interface IProfessional {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
-  galery: string[]; // Assuming gallery can be an array of any type, you can specify it further if needed
+  galery: string[];
+  travelTowns: string[];
 }
 
 export type { IProfessional };
