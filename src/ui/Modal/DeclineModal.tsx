@@ -61,7 +61,7 @@ const DeclineModal: React.FC<DeclineModalProps<any>> = ({
             labelClassName="!font-bold !text-base-color"
             label="Reason for Decline"
             placeholder="Enter reason for decline"
-            rules={[{ required: true, message: "Please input your name!" }]}
+            rules={[{ required: true, message: "Please input your reason!" }]}
           />
         )}
 

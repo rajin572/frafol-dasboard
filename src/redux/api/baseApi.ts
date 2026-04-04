@@ -28,29 +28,36 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
-// const baseQueryWithRefreshToken = async (args, api, extraOptions) => {
+// const baseQueryWithRefreshToken: BaseQueryFn<
+//   string | FetchArgs,
+//   unknown,
+//   FetchBaseQueryError
+// > = async (args, api, extraOptions) => {
 //   let result = await baseQuery(args, api, extraOptions);
 
 //   if (result?.error?.status === 401) {
+//     const refreshToken = Cookies.get("frafoldashboard_refreshToken");
+
+//     if (!refreshToken) {
+//       Cookies.remove("frafoldashboard_accessToken");
+//       return result;
+//     }
+
 //     const res = await fetch(`${getBaseUrl()}/auth/refresh-token`, {
 //       method: "POST",
-//       credentials: "include",
+//       headers: {
+//         "Content-Type": "application/json",
+//         token: refreshToken,
+//       },
 //     });
 
 //     const data = await res.json();
 //     if (data?.data?.accessToken) {
-//       const user = api.getState().auth.user;
-
-//       api.dispatch(
-//         setUser({
-//           user,
-//           token: data.data.accessToken,
-//         })
-//       );
-
+//       Cookies.set("frafoldashboard_accessToken", data.data.accessToken);
 //       result = await baseQuery(args, api, extraOptions);
 //     } else {
-//       // api.dispatch(logout());
+//       Cookies.remove("frafoldashboard_accessToken");
+//       Cookies.remove("frafoldashboard_refreshToken");
 //     }
 //   }
 

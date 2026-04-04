@@ -79,12 +79,14 @@ const InteractionCommunityForum = () => {
   };
   const handleDecline = async (
     record: IInteractionCommunity | null,
-    _value: any
+    value: any
   ) => {
+    console.log(value)
     const res = await tryCatchWrapper(
       declineCommunityForum,
       {
         params: record?._id,
+        body: { reason: value.reason }, // Passing the reason for decline in the body
       },
       "Declining..."
     );
@@ -134,7 +136,7 @@ const InteractionCommunityForum = () => {
         handleCancel={() => setIsDeclineModalVisible(false)}
         currentRecord={currentRecord}
         handleDecline={handleDecline}
-        showInput={false}
+        showInput={true}
       />
     </div>
   );

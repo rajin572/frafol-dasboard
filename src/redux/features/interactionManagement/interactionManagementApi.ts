@@ -42,6 +42,7 @@ const interactionManagementApi = baseApi.injectEndpoints({
       query: (req) => ({
         url: `/community/reject/${req.params}`,
         method: "PATCH",
+        body: req.body, // Passing the body from the request
       }),
       invalidatesTags: [tagTypes.interactionManagement],
     }),

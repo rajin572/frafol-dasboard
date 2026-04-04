@@ -1,4 +1,3 @@
-
 import {
   Document,
   Page,
@@ -6,23 +5,17 @@ import {
   View,
   StyleSheet,
   Image,
-  Font,
+
 } from "@react-pdf/renderer";
 import { IEventOrder } from "../types";
 import { AllImages } from "../../public/images/AllImages";
 import { formatDate } from "./dateFormet";
 
-Font.register({
-  family: "PlaywriteSK",
-  src: "/fonts/PlaywriteSK-Regular.ttf",
-});
 
-// Create styles for the PDF using @react-pdf/renderer's StyleSheet
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: "#efefef",
+    backgroundColor: "#fafafa",
     padding: 30,
-    fontFamily: "PlaywriteSK", // optional global
   },
   header: {
     fontSize: 18,
@@ -92,18 +85,18 @@ const styles = StyleSheet.create({
   },
 });
 
-// Invoice document structure - Service Fee Only (Platform/Admin)
 const InvoiceDocumentFromAdminSide = ({
   currentRecord,
 }: {
   currentRecord: IEventOrder;
 }) => {
-  // Calculate service fee only
   const subtotal = currentRecord.price || 0;
   const serviceFee = (currentRecord.priceWithServiceFee || 0) - subtotal;
 
+  const clientIsCompany = !!(currentRecord.serviceProviderId?.ico);
+
   return (
-    <Document>
+    <Document language="sk">
       <Page size="A4" style={styles.page}>
         {/* Invoice Header */}
         <Text style={styles.header}>F A K T Ú R A / I N V O I C E</Text>
@@ -117,7 +110,7 @@ const InvoiceDocumentFromAdminSide = ({
               <Text style={styles.textBold}>Dátum vystavenia / Issue date:</Text> {formatDate(currentRecord.createdAt)}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Dátum dodania služby / Date of service delivery:</Text>{" "}
+              <Text style={styles.textBold}>Dátum dodania / Date of service delivery:</Text>{" "}
               {formatDate(currentRecord.deliveryDate || currentRecord.date)}
             </Text>
           </View>
@@ -139,43 +132,42 @@ const InvoiceDocumentFromAdminSide = ({
               <Text style={styles.textBold}>DIČ / Tax ID:</Text> 2122571286
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>IBAN:</Text> SK2383300000002403278954
-            </Text>
-            <Text style={styles.text}>
-              <Text style={styles.textBold}>Telefón / Phone:</Text>  0917 174 707
-            </Text>
-            <Text style={styles.text}>
-              <Text style={styles.textBold}>E-mail:</Text>  cvak@frafol.sk
+              <Text style={styles.textBold}>IBAN:</Text> SK3483300000002203424224
             </Text>
           </View>
 
-          {/* Client Information */}
+          {/* Client Information (Photographer/Videographer) */}
           <View style={styles.section}>
             <Text style={styles.subHeader}>
-              OBERATE / CLIENT (
-              {currentRecord.serviceType === "photography"
+              ODBERATEĽ / CLIENT ({currentRecord.serviceType === "photography"
                 ? "Photographer"
-                : "Videographer"} /)
+                : currentRecord.serviceType === "videography"
+                  ? "Videographer"
+                  : "Both"})
             </Text>
             <Text style={styles.text}>
               <Text style={styles.textBold}>Názov firmy / Company name:</Text>{" "}
               {currentRecord.serviceProviderId.companyName || currentRecord.serviceProviderId.name || "___"}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Adresa sídla / Address:</Text>{" "}
+              <Text style={styles.textBold}>Adresa / Address:</Text>{" "}
               {currentRecord.serviceProviderId.address || "__________"}
             </Text>
-            <Text style={styles.text}>
-              <Text style={styles.textBold}>IČO / Company ID:</Text>{" "}
-              {currentRecord.serviceProviderId.ico || "__"}
-            </Text>
-            <Text style={styles.text}>
-              <Text style={styles.textBold}>DIČ / Tax ID:</Text> {currentRecord.serviceProviderId.dic || "____"}
-            </Text>
-            <Text style={styles.text}>
-              <Text style={styles.textBold}>IČ DPH / VAT ID (if VAT payer):</Text>{" "}
-              {currentRecord.serviceProviderId.ic_dph || "____"}
-            </Text>
+            {clientIsCompany && (
+              <>
+                <Text style={styles.text}>
+                  <Text style={styles.textBold}>IČO / Company ID:</Text>{" "}
+                  {currentRecord.serviceProviderId.ico}
+                </Text>
+                <Text style={styles.text}>
+                  <Text style={styles.textBold}>DIČ / Tax ID:</Text> {currentRecord.serviceProviderId.dic || "____"}
+                </Text>
+                <Text style={styles.text}>
+                  <Text style={styles.textBold}>IČ DPH / VAT ID (if VAT payer):</Text>{" "}
+                  {currentRecord.serviceProviderId.ic_dph || "____"}
+                </Text>
+              </>
+            )}
           </View>
         </View>
 
@@ -237,8 +229,7 @@ const InvoiceDocumentFromAdminSide = ({
         {/* Footer */}
         <View style={{ ...styles.section, textAlign: "center", marginTop: 80 }}>
           <Text style={styles.text}>
-            Táto faktúra bola automaticky vygenerovaná prostredníctvom platformy
-            frafol.sk.
+            Táto faktúra bola automaticky vygenerovaná prostredníctvom platformy frafol.sk.
           </Text>
           <Text style={{ ...styles.text, color: "#ad2b08" }}>
             This invoice was automatically generated via the platform frafol.sk.
