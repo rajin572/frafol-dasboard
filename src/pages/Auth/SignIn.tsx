@@ -37,6 +37,11 @@ const SignIn = () => {
         expires: 365,
         secure: false,
       });
+      Cookies.set("frafoldashboard_refreshToken", res?.data?.refreshToken, {
+        path: "/",
+        expires: 365,
+        secure: false,
+      });
       form.resetFields();
       router("/", { replace: true });
     } else if (res?.statusCode === 200 && res?.data?.user?.role !== "admin") {
