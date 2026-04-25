@@ -23,7 +23,7 @@ const SignIn = () => {
   const userExist = useUserData();
 
   useEffect(() => {
-    if (userExist?.role === "admin") {
+    if (userExist?.role === "admin" || userExist?.role === "super-admin") {
       router("/", { replace: true });
     }
   }, [router, userExist]);
@@ -31,7 +31,7 @@ const SignIn = () => {
   const onFinish = async (values: any) => {
     const res = await tryCatchWrapper(login, { body: values }, "Logging In...");
     console.log(res?.data?.user?.role);
-    if (res?.statusCode === 200 && res?.data?.user?.role === "admin") {
+    if (res?.statusCode === 200 && (res?.data?.user?.role === "admin" || res?.data?.user?.role === "super-admin")) {
       Cookies.set("frafoldashboard_accessToken", res?.data?.accessToken, {
         path: "/",
         expires: 365,
@@ -104,7 +104,7 @@ const SignIn = () => {
               <ReuseButton
                 variant="secondary"
                 htmlType="submit"
-                // icon={allIcons.arrowRight}
+              // icon={allIcons.arrowRight}
               >
                 Sign In
               </ReuseButton>

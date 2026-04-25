@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import { Content, Header } from "antd/es/layout/layout";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import getActiveKeys from "../../utils/activeKey";
 import { adminPaths } from "../../Routes/admin.route";
 import { sidebarItemsGenerator } from "../../utils/sidebarItemsGenerator";
@@ -17,6 +17,10 @@ import { AllImages } from "../../../public/images/AllImages";
 import logout from "../../../public/images/dashboard-logo/logout.svg";
 import useUserData from "../../hooks/useUserData";
 import Cookies from "js-cookie";
+import AdminRouteGuard from "../../Routes/AdminRouteGuard";
+
+// Keys that are always visible regardless of routes[]
+const ALWAYS_SIDEBAR_VISIBLE = ["overview", "profile"];
 
 const DashboardLayout = () => {
   const userData = useUserData();
@@ -30,13 +34,13 @@ const DashboardLayout = () => {
       (key: string) => openKeys.indexOf(key) === -1
     );
     if (latestOpenKey && rootSubmenuKeys.includes(latestOpenKey)) {
-      setOpenKeys([latestOpenKey]); // Only keep the latest submenu open
+      setOpenKeys([latestOpenKey]);
     } else {
-      setOpenKeys(keys); // Update normally for closing or nested submenus
+      setOpenKeys(keys);
     }
   };
 
-  const defaultUrl = userData?.role === "admin" ? "/admin" : "/";
+  const defaultUrl = "/admin";
   const normalizedPath = location.pathname.replace(defaultUrl, "");
 
   const [collapsed, setCollapsed] = useState(false);
@@ -51,19 +55,50 @@ const DashboardLayout = () => {
     };
 
     handleResize();
-
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Filter sidebar paths based on role and allowed routes
+  const filteredPaths = useMemo(() => {
+    if (!userData) return [];
+
+    // super-admin sees everything
+    if (userData.role === "super-admin") return adminPaths;
+
+    if (userData.role === "admin") {
+      const allowedRoutes = userData.allowedRoutes ?? [];
+      const hasAll = allowedRoutes.includes("all");
+
+      return adminPaths
+        .map((item) => {
+          // Items with no name (like notifications) are never shown
+          if (!item.name && !item.children) return null;
+
+          // Always-visible items
+          if (ALWAYS_SIDEBAR_VISIBLE.includes(item.key)) return item;
+
+          if (hasAll) return item;
+
+          // Parent items with children: show if key is in allowedRoutes
+          if (item.children) {
+            if (!allowedRoutes.includes(item.key)) return null;
+            return item;
+          }
+
+          // Flat items
+          return allowedRoutes.includes(item.key) ? item : null;
+        })
+        .filter(Boolean) as typeof adminPaths;
+    }
+
+    return [];
+  }, [userData]);
 
   const activeKeys = getActiveKeys(normalizedPath);
   const menuItems =
-    userData?.role === "admin"
-      ? //   ? sidebarItemsGenerator(adminPaths, "admin")
-        sidebarItemsGenerator(adminPaths, userData?.role)
+    userData?.role === "admin" || userData?.role === "super-admin"
+      ? sidebarItemsGenerator(filteredPaths, "admin")
       : [];
 
   const handleLogout = () => {
@@ -114,8 +149,8 @@ const DashboardLayout = () => {
 
           <Menu
             mode="inline"
-            openKeys={openKeys} // Bind openKeys state
-            onOpenChange={onOpenChange} // Handle open/close
+            openKeys={openKeys}
+            onOpenChange={onOpenChange}
             defaultSelectedKeys={activeKeys}
             selectedKeys={activeKeys}
             style={{
@@ -141,7 +176,9 @@ const DashboardLayout = () => {
           </Header>
           <Content>
             <div className="bg-primary-color px-2 xl:px-5 py-4 xl:py-5">
-              <Outlet />
+              <AdminRouteGuard>
+                <Outlet />
+              </AdminRouteGuard>
             </div>
           </Content>
         </Layout>

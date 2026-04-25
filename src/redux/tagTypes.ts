@@ -19,6 +19,8 @@ export const tagTypes = {
   coupon: "Coupon",
   subscription: "Subscription",
   town: "Town",
+  deleteAccountRequest: "DeleteAccountRequest",
+  adminManagement: "AdminManagement",
 };
 
 export const tagTypesList = [
@@ -42,4 +44,6 @@ export const tagTypesList = [
   tagTypes.coupon,
   tagTypes.subscription,
   tagTypes.town,
+  tagTypes.deleteAccountRequest,
+  tagTypes.adminManagement,
 ];

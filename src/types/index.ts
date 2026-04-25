@@ -1,4 +1,6 @@
 export * from "./auth.type";
+export * from "./admin.type";
+export * from "./deleteAccountRequest.type";
 export * from "./users.type";
 export * from "./earning.type";
 export * from "./report.type";

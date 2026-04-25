@@ -46,6 +46,8 @@ import CommunityForumManagement from "../pages/Admin/CommunityForumManagement";
 import TermsOfServiceConceptural from "../pages/Common/settings/TermsOfServiceConceptural";
 import TermsOfServiceMarketplace from "../pages/Common/settings/TermsOfServiceMarketplace";
 import AdminAllTown from "../pages/Admin/AdminAllTown";
+import AdminManagement from "../pages/Admin/AdminManagement";
+// import DeleteAccountRequests from "../pages/Admin/DeleteAccountRequests";
 
 export const adminPaths = [
   {
@@ -266,6 +268,20 @@ export const adminPaths = [
       // },
     ],
   },
+  // {
+  //   path: "delete-account-requests",
+  //   element: <DeleteAccountRequests />,
+  //   key: "delete-account-requests",
+  //   name: "Delete Requests",
+  //   icon: userLogo,
+  // },
+  {
+    path: "admin-management",
+    element: <AdminManagement />,
+    key: "admin-management",
+    name: "Admin Management",
+    icon: settingsLogo,
+  },
   {
     path: "profile",
     element: <ProfileSettingsPage />,
@@ -279,3 +295,4 @@ export const adminPaths = [
     key: "notifications",
   },
 ];
+

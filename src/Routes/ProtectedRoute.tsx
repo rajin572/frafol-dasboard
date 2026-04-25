@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const user = useUserData();
 
-  if (!user || user.role !== role) {
+  if (!user || (user.role !== role && user.role !== "super-admin")) {
     return <Navigate to="/sign-in" replace />;
   }
 

@@ -29,9 +29,8 @@ function AuthRedirect() {
 
   useEffect(() => {
     if (user && user.role) {
-      navigate(`/${user.role}/overview`, {
-        replace: true,
-      });
+      const basePath = user.role === "super-admin" ? "admin" : user.role;
+      navigate(`/${basePath}/overview`, { replace: true });
     } else {
       navigate("/sign-in", { replace: true });
     }

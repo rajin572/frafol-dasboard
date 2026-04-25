@@ -4,7 +4,8 @@ interface IJwtPayload {
   sureName: string;
   companyName: string;
   email: string;
-  role: "admin" | "user" | "other";
+  role: "super-admin" | "admin" | "user" | "other";
+  allowedRoutes?: string[];
   iat: number;
   exp: number;
 }

@@ -52,6 +52,29 @@ const UsersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.users],
     }),
+    getDeleteAccountRequests: builder.query({
+      query: ({ page, limit, searchTerm }) => ({
+        url: `/users/delete-account-requests`,
+        method: "GET",
+        params: { page, limit, searchTerm },
+      }),
+      providesTags: [tagTypes.deleteAccountRequest],
+    }),
+    approveDeleteAccountRequest: builder.mutation({
+      query: (req) => ({
+        url: `/users/delete-account-requests/${req.params}/approve`,
+        method: "PATCH",
+      }),
+      invalidatesTags: [tagTypes.deleteAccountRequest],
+    }),
+    rejectDeleteAccountRequest: builder.mutation({
+      query: (req) => ({
+        url: `/users/delete-account-requests/${req.params}/reject`,
+        method: "PATCH",
+        body: req.body,
+      }),
+      invalidatesTags: [tagTypes.deleteAccountRequest],
+    }),
   }),
 });
 
@@ -63,4 +86,7 @@ export const {
   useApproveProfessionalMutation,
   useDeclineProfessionalMutation,
   useBlockAndUnblockUserMutation,
+  useGetDeleteAccountRequestsQuery,
+  useApproveDeleteAccountRequestMutation,
+  useRejectDeleteAccountRequestMutation,
 } = UsersApi;
