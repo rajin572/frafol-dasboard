@@ -63,6 +63,7 @@ const ReuseSelect = ({
           placeholder={placeholder}
           disabled={disabled}
           allowClear={allowClear}
+          defaultValue={value}
           onChange={onChange}
         >
           {options.map((option) => (

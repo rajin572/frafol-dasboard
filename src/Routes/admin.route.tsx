@@ -47,6 +47,7 @@ import TermsOfServiceConceptural from "../pages/Common/settings/TermsOfServiceCo
 import TermsOfServiceMarketplace from "../pages/Common/settings/TermsOfServiceMarketplace";
 import AdminAllTown from "../pages/Admin/AdminAllTown";
 import AdminManagement from "../pages/Admin/AdminManagement";
+import AdminAllSubscriptionTransaction from "../pages/Admin/AdminAllSubscriptionTransaction";
 // import DeleteAccountRequests from "../pages/Admin/DeleteAccountRequests";
 
 export const adminPaths = [
@@ -115,10 +116,17 @@ export const adminPaths = [
     icon: workshopLogo,
   },
   {
-    path: "earning",
+    path: "commission-earning",
     element: <AdminAllTransaction />,
-    key: "earning",
-    name: "Earnings",
+    key: "commission-earning",
+    name: "Commission Earnings",
+    icon: earningLogo,
+  },
+  {
+    path: "subscription-earning",
+    element: <AdminAllSubscriptionTransaction />,
+    key: "subscription-earning",
+    name: "Subscription Earnings",
     icon: earningLogo,
   },
   {

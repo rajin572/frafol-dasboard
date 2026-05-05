@@ -18,6 +18,8 @@ interface AdminAllDeliveryManagementTableProps {
 const AdminAllDeliveryManagementTable: React.FC<
   AdminAllDeliveryManagementTableProps
 > = ({ data, loading, setPage, showViewPaymentModal, page, total, limit }) => {
+
+  console.log(data)
   const columns = [
     {
       title: "Order ID",
@@ -60,9 +62,9 @@ const AdminAllDeliveryManagementTable: React.FC<
     },
     {
       title: "Amount",
-      dataIndex: "totalPrice",
+      dataIndex: "price",
       key: "amount",
-      render: (amount: number) => `$${amount}`,
+      render: (amount: number) => `€${amount}`,
     },
     {
       title: "Delivery Date",

@@ -4,17 +4,20 @@ import ReuseSearchInput from "../../ui/Form/ReuseSearchInput";
 import TransactionTable from "../../ui/Tables/TransactionTable";
 import TransactionViewModal from "../../ui/Modal/Transactions/TransactionViewModal";
 import { useGetEarningsQuery } from "../../redux/features/earning/earningApi";
+import ReuseSelect from "../../ui/Form/ReuseSelect";
 
 const AdminAllTransaction = () => {
   const limit = 12;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
+  const [type, setType] = useState("event");
 
   const { data, isFetching } = useGetEarningsQuery(
     {
       limit,
       page,
       searchTerm: searchText,
+      paymentType: type,
     },
     {
       refetchOnMountOrArgChange: true,
@@ -26,10 +29,11 @@ const AdminAllTransaction = () => {
 
   const payments: any = data?.data?.payments || [];
 
-  console.log(payments);
+
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
+  console.log(currentRecord)
   const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
@@ -54,6 +58,17 @@ const AdminAllTransaction = () => {
           />
         </div>
       </div>
+      <ReuseSelect
+        name=""
+        options={[
+          { label: "Event", value: "event" },
+          { label: "Gear", value: "gear" },
+          { label: "Workshop", value: "workshop" },
+        ]}
+        onChange={(e) => setType(e)}
+        value={type}
+        selectClassName="!w-[160px]"
+      />
       <TransactionTable
         data={payments}
         loading={isFetching}

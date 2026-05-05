@@ -25,7 +25,6 @@ function AuthRedirect() {
   const user = useUserData();
   const navigate = useNavigate();
 
-  console.log("user", user);
 
   useEffect(() => {
     if (user && user.role) {

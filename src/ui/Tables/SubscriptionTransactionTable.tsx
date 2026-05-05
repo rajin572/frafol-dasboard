@@ -5,7 +5,7 @@ import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
 import { ITransaction } from "../../types";
 
-interface TransactionTableProps {
+interface SubscriptionTransactionTableProps {
   data: ITransaction[];
   loading: boolean;
   showViewModal: (record: ITransaction) => void;
@@ -15,7 +15,7 @@ interface TransactionTableProps {
   limit: number;
 }
 
-const TransactionTable: React.FC<TransactionTableProps> = ({
+const SubscriptionTransactionTable: React.FC<SubscriptionTransactionTableProps> = ({
   data,
   loading,
   showViewModal,
@@ -32,48 +32,50 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         page * limit - limit + index + 1,
     },
     {
-      title: "Client Name",
-      key: "clientName",
+      title: "Subscriber Name",
+      key: "name",
       render: (_: any, record: ITransaction) => record?.userId?.name || "—",
     },
     {
-      title: "Professional Name",
-      key: "serviceProviderId",
-      render: (_: any, record: ITransaction) =>
-        record?.serviceProviderId?.name || (record.paymentType === "subscription" ? "—" : "—"),
+      title: "Email",
+      key: "email",
+      render: (_: any, record: ITransaction) => record?.userId?.email || "—",
     },
     {
-      title: "Payment Type",
-      dataIndex: "paymentType",
-      key: "paymentType",
-      render: (type: string) => <span className="capitalize">{type}</span>,
+      title: "Subscription Days",
+      key: "subscriptionDays",
+      render: (_: any, record: ITransaction) =>
+        record?.subscriptionDays ? `${record.subscriptionDays} days` : "—",
+    },
+    {
+      title: "Amount",
+      key: "amount",
+      render: (_: any, record: ITransaction) =>
+        `$${record?.amount?.toFixed(2)}`,
     },
     {
       title: "Method",
       dataIndex: "paymentMethod",
       key: "method",
+      render: (method: string) => <span className="capitalize">{method}</span>,
     },
     {
-      title: "Transaction ID",
-      key: "transactionId",
-      render: (_: any, record: ITransaction) => (
-        <p className="line-clamp-1 max-w-[200px]">
-          {record?.transactionId?.slice(0, 20)}...
-        </p>
+      title: "Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (status: string) => (
+        <span
+          className={`capitalize font-medium ${
+            status === "completed"
+              ? "text-green-600"
+              : status === "failed"
+                ? "text-red-600"
+                : "text-yellow-600"
+          }`}
+        >
+          {status}
+        </span>
       ),
-    },
-    {
-      title: "Commission",
-      key: "commission",
-      render: (_: any, record: ITransaction) =>
-        record.paymentType === "subscription"
-          ? "—"
-          : `$${record?.commission?.toFixed(2)}`,
-    },
-    {
-      title: "Amount",
-      key: "amount",
-      render: (_: any, record: ITransaction) => `$${record?.amount?.toFixed(2)}`,
     },
     {
       title: "Date",
@@ -114,4 +116,4 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   );
 };
 
-export default TransactionTable;
+export default SubscriptionTransactionTable;
