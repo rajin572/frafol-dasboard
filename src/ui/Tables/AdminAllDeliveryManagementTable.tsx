@@ -25,8 +25,6 @@ const AdminAllDeliveryManagementTable: React.FC<
       title: "Order ID",
       dataIndex: "orderId",
       key: "orderId",
-      render: (_: unknown, __: unknown, index: number) =>
-        page * limit - limit + index + 1,
     },
     {
       title: "Client Name",
@@ -64,7 +62,7 @@ const AdminAllDeliveryManagementTable: React.FC<
       title: "Amount",
       dataIndex: "price",
       key: "amount",
-      render: (amount: number) => `€${amount}`,
+      render: (amount: number, record: IDeliveryManagement) => `€${record?.totalPrice as number - (record?.priceWithServiceFee - amount)}`,
     },
     {
       title: "Delivery Date",

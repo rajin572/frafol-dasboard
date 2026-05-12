@@ -33,6 +33,8 @@ interface GearMarketplace {
   name: string;
   price: number;
   vatAmount: number;
+  totalVatAmount?: number;
+  platformCommission: number;
   description: string;
   condition: string;
   gallery: string[];

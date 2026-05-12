@@ -55,8 +55,17 @@ const AdminGearDeliveryTable: React.FC<AdminGearDeliveryTableProps> = ({
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      render: (_: unknown, record: IDeliveryManagement) =>
-        `$${record?.gearMarketplaceId?.price || record?.price || 0}`,
+      render: (_: unknown, record: IDeliveryManagement) => {
+        const gear = record?.gearMarketplaceId;
+        if (gear) {
+          const total =
+            (gear.price || 0) +
+            (gear.totalVatAmount || 0) +
+            (gear.shippingCompany?.price || 0);
+          return `$${total}`;
+        }
+        return `$${record?.price || 0}`;
+      },
     },
     {
       title: "Delivery Date",
@@ -73,12 +82,11 @@ const AdminGearDeliveryTable: React.FC<AdminGearDeliveryTableProps> = ({
       key: "deliveryStatus",
       render: (_: unknown, record: IDeliveryManagement) => (
         <span
-          className={`${
-            record?.orderStatus === "delivered" ||
-            record?.status === "delivered"
+          className={`${record?.orderStatus === "delivered" ||
+              record?.status === "delivered"
               ? "text-success"
               : "text-warning"
-          } font-semibold`}
+            } font-semibold`}
         >
           {record?.orderStatus || "N/A"}
         </span>
@@ -90,9 +98,8 @@ const AdminGearDeliveryTable: React.FC<AdminGearDeliveryTableProps> = ({
       key: "paymentStatus",
       render: (_: unknown, record: IDeliveryManagement) => (
         <span
-          className={`${
-            record?.paymentStatus === "pending" ? "text-error" : "text-success"
-          } font-semibold`}
+          className={`${record?.paymentStatus === "pending" ? "text-error" : "text-success"
+            } font-semibold`}
         >
           {record?.paymentStatus === "pending" ? "Unpaid" : "Paid"}
         </span>

@@ -80,6 +80,24 @@ const GearOrderViewModal: React.FC<GearOrderViewModalProps> = ({
             <h3 className="font-semibold mb-4">Order Summary</h3>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex justify-between">
+                <span>Price :</span>
+                <span className="text-black">
+                  {currentRecord?.gearMarketplaceId?.price?.toFixed(2)}€
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>VAT :</span>
+                <span className="text-black">
+                  {currentRecord?.gearMarketplaceId?.totalVatAmount?.toFixed(2)}€
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Service Charge :</span>
+                <span className="text-black">
+                  {currentRecord?.gearMarketplaceId?.platformCommission?.toFixed(2)}€
+                </span>
+              </div>
+              <div className="border-t pt-2 flex justify-between">
                 <span>Sub Total :</span>
                 <span className="text-black font-medium">
                   {currentRecord?.gearMarketplaceId?.mainPrice?.toFixed(2)}€

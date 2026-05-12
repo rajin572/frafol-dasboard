@@ -4,9 +4,16 @@ import { tagTypes } from "../../tagTypes";
 const deliveryManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDeliveryManagement: builder.query({
-      query: ({ page, limit, searchTerm, type }) => ({
-        url: `/users/delivery-orders?page=${page}&limit=${limit}&searchTerm=${searchTerm}&type=${type}`,
+      query: ({ page, limit, searchTerm, type, paymentStatus }) => ({
+        url: `/users/delivery-orders`,
         method: "GET",
+        params: {
+          page,
+          limit,
+          searchTerm,
+          type,
+          ...(paymentStatus ? { paymentStatus } : {}),
+        },
       }),
       providesTags: [tagTypes.deliveryManagement],
     }),
@@ -20,6 +27,13 @@ const deliveryManagementApi = baseApi.injectEndpoints({
     gearOrderMakePayment: builder.mutation({
       query: (req) => ({
         url: `/gear-order/complete-payment/${req.params}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: [tagTypes.deliveryManagement],
+    }),
+    workshopOrderMakePayment: builder.mutation({
+      query: (req) => ({
+        url: `/workshopParticipant/complete-instructor-payment/${req.params}`,
         method: "PATCH",
       }),
       invalidatesTags: [tagTypes.deliveryManagement],
@@ -39,4 +53,5 @@ export const {
   useGetDeliveryManagementQuery,
   useEverOrderMakePaymentMutation,
   useGearOrderMakePaymentMutation,
+  useWorkshopOrderMakePaymentMutation,
 } = deliveryManagementApi;

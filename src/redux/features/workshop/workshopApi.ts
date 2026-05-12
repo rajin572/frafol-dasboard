@@ -6,7 +6,7 @@ const gearApi = baseApi.injectEndpoints({
     getAllWorkshop: builder.query({
       query: ({ page, limit, searchTerm }) => {
         return {
-          url: "/workshop",
+          url: "/workshop/admin",
           method: "GET",
           params: { page, limit, searchTerm },
         };

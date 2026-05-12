@@ -49,6 +49,7 @@ interface IGearMarketplace {
   name: string;
   price: number;
   vatAmount: number;
+  totalVatAmount?: number;
   description: string;
   condition: string;
   gallery: string[];
@@ -69,6 +70,7 @@ interface IGearMarketplace {
 export interface IDeliveryManagement {
   _id: string;
   orderId: string;
+  title?: string; // for service orders
   userId: IUserBasic; // client
   serviceProviderId?: IUserBasic; // only for service orders
   sellerId?: IUserBasic; // only for gear orders
@@ -78,6 +80,7 @@ export interface IDeliveryManagement {
   time?: string; // service order
   location?: string; // service order
   price: number;
+  priceWithServiceFee: number;
   vatAmount: number;
   totalPrice?: number; // optional for gear
   packageId?: string;
