@@ -62,7 +62,7 @@ const AdminAllDeliveryManagementTable: React.FC<
       title: "Amount",
       dataIndex: "price",
       key: "amount",
-      render: (amount: number, record: IDeliveryManagement) => `€${record?.totalPrice as number - (record?.priceWithServiceFee - amount)}`,
+      render: (amount: number, record: IDeliveryManagement) => `${record?.totalPrice as number - (record?.priceWithServiceFee - amount)}€`,
     },
     {
       title: "Delivery Date",

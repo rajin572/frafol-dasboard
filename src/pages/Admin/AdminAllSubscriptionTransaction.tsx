@@ -18,7 +18,7 @@ const AdminAllSubscriptionTransaction = () => {
     );
 
     const total = data?.data?.meta?.total || 0;
-    const payments: ITransaction[] = data?.data?.payments || [];
+    const payments: ITransaction[] = data?.data?.orders || [];
 
     const showViewModal = (record: ITransaction) => {
         setCurrentRecord(record);

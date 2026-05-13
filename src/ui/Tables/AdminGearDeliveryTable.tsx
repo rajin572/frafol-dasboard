@@ -62,9 +62,9 @@ const AdminGearDeliveryTable: React.FC<AdminGearDeliveryTableProps> = ({
             (gear.price || 0) +
             (gear.totalVatAmount || 0) +
             (gear.shippingCompany?.price || 0);
-          return `$${total}`;
+          return `${total}€`;
         }
-        return `$${record?.price || 0}`;
+        return `${record?.price || 0}€`;
       },
     },
     {
@@ -83,9 +83,9 @@ const AdminGearDeliveryTable: React.FC<AdminGearDeliveryTableProps> = ({
       render: (_: unknown, record: IDeliveryManagement) => (
         <span
           className={`${record?.orderStatus === "delivered" ||
-              record?.status === "delivered"
-              ? "text-success"
-              : "text-warning"
+            record?.status === "delivered"
+            ? "text-success"
+            : "text-warning"
             } font-semibold`}
         >
           {record?.orderStatus || "N/A"}

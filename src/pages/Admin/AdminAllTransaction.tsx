@@ -26,14 +26,13 @@ const AdminAllTransaction = () => {
   );
 
   const total = data?.data?.meta?.total || 0;
-
-  const payments: any = data?.data?.payments || [];
+  const payments: any = data?.data?.orders || [];
 
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);
 
-  console.log(currentRecord)
+  console.log(data)
   const showViewUserModal = (record: any) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
@@ -48,7 +47,7 @@ const AdminAllTransaction = () => {
     <div className=" bg-primary-color rounded-xl p-4 min-h-[90vh]">
       <div className="flex justify-between items-center mx-3 py-2 mb-5">
         <p className="text-xl sm:text-2xl lg:text-3xl text-base-color font-bold ">
-          Earnings
+          Commission  Earnings
         </p>
         <div className="h-fit">
           <ReuseSearchInput

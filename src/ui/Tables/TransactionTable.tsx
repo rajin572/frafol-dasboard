@@ -26,21 +26,33 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 }) => {
   const columns = [
     {
-      title: "UID",
-      key: "id",
-      render: (_: any, __: any, index: number) =>
-        page * limit - limit + index + 1,
+      title: "Order ID",
+      key: "orderId",
+      render: (_: any, record: ITransaction) => {
+        if (record.paymentType === "gear") {
+          return record.orderId || record._id.slice(-8).toUpperCase();
+        }
+        if (
+          record.paymentType === "event" &&
+          record.eventOrderId &&
+          typeof record.eventOrderId !== "string"
+        ) {
+          return record.eventOrderId.orderId;
+        }
+        return record._id.slice(-8).toUpperCase();
+      },
     },
     {
       title: "Client Name",
       key: "clientName",
-      render: (_: any, record: ITransaction) => record?.userId?.name || "—",
+      render: (_: any, record: ITransaction) =>
+        record?.client?.name || record?.userId?.name || "—",
     },
     {
       title: "Professional Name",
       key: "serviceProviderId",
       render: (_: any, record: ITransaction) =>
-        record?.serviceProviderId?.name || (record.paymentType === "subscription" ? "—" : "—"),
+        record?.seller?.name || record?.serviceProviderId?.name || "—",
     },
     {
       title: "Payment Type",
@@ -63,17 +75,56 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       ),
     },
     {
-      title: "Commission",
-      key: "commission",
-      render: (_: any, record: ITransaction) =>
-        record.paymentType === "subscription"
-          ? "—"
-          : `$${record?.commission?.toFixed(2)}`,
+      title: "Service Fee",
+      key: "serviceFee",
+      render: (_: any, record: ITransaction) => {
+        if (record.paymentType === "subscription") return "—";
+        if (
+          record.paymentType === "event" &&
+          record.eventOrderId &&
+          typeof record.eventOrderId !== "string"
+        ) {
+          const fee = (record.eventOrderId.priceWithServiceFee || 0) - (record.eventOrderId.price || 0);
+          return `€${fee.toFixed(2)}`;
+        }
+        if (record.paymentType === "gear" && record.gear) {
+          return `€${record.gear.platformCommission.toFixed(2)}`;
+        }
+        if (
+          record.paymentType === "workshop" &&
+          record.workshopId &&
+          typeof record.workshopId !== "string"
+        ) {
+          const ws = record.workshopId;
+          const fee = ws.mainPrice - ws.price - ws.vatAmount;
+          return `€${fee.toFixed(2)}`;
+        }
+        return "—";
+      },
     },
     {
       title: "Amount",
       key: "amount",
-      render: (_: any, record: ITransaction) => `$${record?.amount?.toFixed(2)}`,
+      render: (_: any, record: ITransaction) => {
+        if (
+          record.paymentType === "event" &&
+          record.eventOrderId &&
+          typeof record.eventOrderId !== "string"
+        ) {
+          return `€${(record.eventOrderId.totalPrice || 0).toFixed(2)}`;
+        }
+        if (record.paymentType === "gear" && record.gear) {
+          return `€${record.gear.mainPrice.toFixed(2)}`;
+        }
+        if (
+          record.paymentType === "workshop" &&
+          record.workshopId &&
+          typeof record.workshopId !== "string"
+        ) {
+          return `€${record.workshopId.mainPrice.toFixed(2)}`;
+        }
+        return `€${(record?.amount || 0).toFixed(2)}`;
+      },
     },
     {
       title: "Date",

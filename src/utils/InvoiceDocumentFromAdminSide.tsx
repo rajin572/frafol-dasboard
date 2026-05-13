@@ -90,8 +90,7 @@ const InvoiceDocumentFromAdminSide = ({
 }: {
   currentRecord: IEventOrder;
 }) => {
-  const subtotal = currentRecord.price || 0;
-  const serviceFee = (currentRecord.priceWithServiceFee || 0) - subtotal;
+  const platformCommission = (currentRecord.priceWithServiceFee || 0) - (currentRecord.price || 0);
 
   const clientIsCompany = !!(currentRecord.serviceProviderId?.ico);
 
@@ -171,7 +170,7 @@ const InvoiceDocumentFromAdminSide = ({
           </View>
         </View>
 
-        {/* Product/Service Table - Service Fee Only */}
+        {/* Product/Service Table - Platform Commission Only */}
         <View style={styles.table}>
           <View
             style={{
@@ -186,16 +185,11 @@ const InvoiceDocumentFromAdminSide = ({
             <Text style={styles.tableCell}>SPOLU / TOTAL</Text>
           </View>
 
-          {/* Service Fee Row */}
           <View style={styles.tableRow}>
-            <Text style={styles.tableCellDark}>
-              Servisný poplatok / Service fee
-            </Text>
-            <Text style={styles.tableCellDark}>
-              1 ks / <Text style={{ color: "#ad2b08" }}>pc</Text>
-            </Text>
-            <Text style={styles.tableCellDark}>€{serviceFee.toFixed(2)}</Text>
-            <Text style={styles.tableCellDark}>€{serviceFee.toFixed(2)}</Text>
+            <Text style={styles.tableCellDark}>Servisný poplatok / Platform Commission</Text>
+            <Text style={styles.tableCellDark}>1 ks / <Text style={{ color: "#ad2b08" }}>pc</Text></Text>
+            <Text style={styles.tableCellDark}>€{platformCommission.toFixed(2)}</Text>
+            <Text style={styles.tableCellDark}>€{platformCommission.toFixed(2)}</Text>
           </View>
         </View>
 
@@ -204,9 +198,7 @@ const InvoiceDocumentFromAdminSide = ({
           <Text style={{ ...styles.text, marginBottom: 5 }}>
             <Text style={{ fontWeight: "bold", color: "#000000" }}>MEDZISÚČET / </Text>
             <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>SUBTOTAL: </Text>
-            <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>
-              €{serviceFee.toFixed(2)}
-            </Text>
+            <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>€{platformCommission.toFixed(2)}</Text>
           </Text>
           <Text
             style={{
@@ -222,7 +214,7 @@ const InvoiceDocumentFromAdminSide = ({
             }}
           >
             <Text>SPOLU / TOTAL: </Text>
-            <Text>€{serviceFee.toFixed(2)}</Text>
+            <Text>€{platformCommission.toFixed(2)}</Text>
           </Text>
         </View>
 

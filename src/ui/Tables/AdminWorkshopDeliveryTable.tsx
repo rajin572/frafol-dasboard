@@ -115,7 +115,7 @@ const AdminWorkshopDeliveryTable: React.FC<AdminWorkshopDeliveryTableProps> = ({
       title: "Amount",
       key: "amount",
       render: (_: unknown, record: IWorkshopDelivery) =>
-        `€${record?.instructorPayment?.amount ?? record?.workshopId?.price ?? 0}`,
+        `${record?.instructorPayment?.amount ?? record?.workshopId?.price ?? 0}€`,
     },
     {
       title: "Client Payment",
