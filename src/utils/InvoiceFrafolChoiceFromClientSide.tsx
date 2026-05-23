@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Document,
   Page,
@@ -84,8 +85,8 @@ const InvoiceFrafolChoiceFromClientSide = ({
   subscriptionData,
   pack,
 }: {
-  myData: IProfile;
-  subscriptionData: ISubscriptionData;
+  myData: any;
+  subscriptionData: any;
   pack: ISubscription;
 }) => {
   const invoiceNumber = `FC-${pack._id.slice(-8).toUpperCase()}-${new Date().getFullYear()}`;
@@ -100,7 +101,7 @@ const InvoiceFrafolChoiceFromClientSide = ({
 
         {/* Logo + Invoice meta */}
         <View style={{ ...styles.headerSection, alignItems: "center" }}>
-          <Image src={AllImages.logo.src} style={styles.image} />
+          <Image src={AllImages.logo} style={styles.image} />
           <View style={styles.section}>
             <Text style={styles.text}>
               <Text style={styles.textBold}>Číslo faktúry / Invoice number:</Text> [{invoiceNumber}]
