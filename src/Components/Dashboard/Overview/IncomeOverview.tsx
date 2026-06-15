@@ -18,7 +18,7 @@ const IncomeOverview = () => {
   );
 
   return (
-    <div className="w-full lg:w-1/2 p-3 bg-[#FFFFFF] rounded-lg flex flex-col border border-[#E1E1E1]">
+    <div className="w-full p-3 bg-[#FFFFFF] rounded-lg flex flex-col border border-[#E1E1E1]">
       <div className="flex justify-between text-base-color mt-4">
         <p className="text-2xl lg:text-3xl text-secondary-color font-bold mb-5">
           Income

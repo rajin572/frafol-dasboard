@@ -188,7 +188,7 @@ const Topbar = ({ collapsed, setCollapsed }: any) => {
                 }
                 alt="profile_pic"
                 style={{ width: "40px", height: "40px", marginRight: "10px" }}
-                className="rounded-full"
+                className="rounded-full object-cover"
               />
               <div className="flex flex-col justify-center">
                 <p className="text-base-color font-semibold text-sm">
