@@ -47,15 +47,11 @@ const ReuseTable: React.FC<ReuseTableProps<any>> = ({
     if (draggedIndex === null || draggedIndex === dropIndex) return;
 
     const newData = [...data];
-
-    // SWAP items instead of reordering
-    const temp = newData[draggedIndex];
-    newData[draggedIndex] = newData[dropIndex];
-    newData[dropIndex] = temp;
+    const [removed] = newData.splice(draggedIndex, 1);
+    newData.splice(dropIndex, 0, removed);
 
     setDraggedIndex(null);
 
-    // Call the callback with swapped data
     if (onDragEnd) {
       onDragEnd(newData);
     }
