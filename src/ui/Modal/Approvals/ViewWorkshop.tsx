@@ -32,9 +32,9 @@ const ViewWorkshop = ({
         className="w-full h-80 sm:h-60 lg:h-72 xl:h-80 object-cover rounded-lg "
       />
       <div className="flex items-center justify-between gap-2 absolute top-2  w-full px-2">
-        {currentRecord?.vatAmount > 0 ? (
+        {currentRecord?.vatPercent > 0 ? (
           <span className="text-xs sm:text-sm bg-secondary-color text-primary-color py-0.5 px-1.5 rounded-full ">
-            VAT Included: {currentRecord?.vatAmount}%
+            VAT Included: {currentRecord?.vatPercent}%
           </span>
         ) : (
           <span></span>

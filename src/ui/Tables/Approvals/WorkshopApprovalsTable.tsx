@@ -27,6 +27,7 @@ const WorkshopApprovalsTable: React.FC<WorkshopApprovalsTableProps> = ({
   total,
   limit,
 }) => {
+  console.log(data)
   const columns = [
     {
       title: "ID",
@@ -44,7 +45,7 @@ const WorkshopApprovalsTable: React.FC<WorkshopApprovalsTableProps> = ({
       align: "center",
     },
     { title: "Max Participant", dataIndex: "maxParticipant", key: "maxParticipant" },
-    { title: "VAT (%)", dataIndex: "vatAmount", key: "vatAmount" },
+    { title: "VAT (%)", dataIndex: "vatPercent", key: "vatPercent" },
     { title: "Host Name", dataIndex: ["authorId", "name"], key: "authorId" },
     {
       title: "Date",

@@ -8,6 +8,7 @@ interface Author {
 
 interface IWorkshop {
   vatAmount: number;
+  vatPercent: number;
   _id: string;
   authorId: Author;
   title: string;

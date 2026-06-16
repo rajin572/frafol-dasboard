@@ -51,7 +51,7 @@ const SubscriptionTransactionTable: React.FC<SubscriptionTransactionTableProps> 
       title: "Amount",
       key: "amount",
       render: (_: any, record: ITransaction) =>
-        `$${record?.amount?.toFixed(2)}`,
+        `${record?.amount?.toFixed(2)}€`,
     },
     {
       title: "Method",
@@ -65,13 +65,12 @@ const SubscriptionTransactionTable: React.FC<SubscriptionTransactionTableProps> 
       key: "paymentStatus",
       render: (status: string) => (
         <span
-          className={`capitalize font-medium ${
-            status === "completed"
-              ? "text-green-600"
-              : status === "failed"
-                ? "text-red-600"
-                : "text-yellow-600"
-          }`}
+          className={`capitalize font-medium ${status === "completed"
+            ? "text-green-600"
+            : status === "failed"
+              ? "text-red-600"
+              : "text-yellow-600"
+            }`}
         >
           {status}
         </span>
