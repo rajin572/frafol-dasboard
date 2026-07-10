@@ -55,6 +55,12 @@ const AdminWorkshopDeliveryTable: React.FC<AdminWorkshopDeliveryTableProps> = ({
         record?.instructorId?.profileId?.bankName || "—",
     },
     {
+      title: "Account Number",
+      key: "accountNumber",
+      render: (_: unknown, record: IWorkshopDelivery) =>
+        record?.instructorId?.profileId?.accountNumber || "—",
+    },
+    {
       title: "Workshop",
       key: "workshop",
       render: (_: unknown, record: IWorkshopDelivery) =>

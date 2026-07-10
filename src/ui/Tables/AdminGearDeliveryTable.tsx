@@ -52,6 +52,24 @@ const AdminGearDeliveryTable: React.FC<AdminGearDeliveryTableProps> = ({
         record?.sellerId?.name || record?.serviceProviderId?.name || "N/A",
     },
     {
+      title: "Bank Name",
+      dataIndex: "bankName",
+      key: "bankName",
+      render: (_: unknown, record: IDeliveryManagement) =>
+        record?.sellerId?.profileId?.bankName ||
+        record?.serviceProviderId?.profileId?.bankName ||
+        "N/A",
+    },
+    {
+      title: "Account Number",
+      dataIndex: "accountNumber",
+      key: "accountNumber",
+      render: (_: unknown, record: IDeliveryManagement) =>
+        record?.sellerId?.profileId?.accountNumber ||
+        record?.serviceProviderId?.profileId?.accountNumber ||
+        "N/A",
+    },
+    {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
