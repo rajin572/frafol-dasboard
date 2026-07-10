@@ -149,9 +149,9 @@ const ConversationSendMessage = ({ socket }: any) => {
         )}
 
         <Form form={form} onFinish={handleMessageSend}>
-          <div className="!bg-white absolute -bottom-0 flex justify-center items-center w-full p-1">
-            <div className="w-full rounded-full bg-white border border-secondary-color px-4 py-2 flex items-center space-x-4">
-              <Form.Item className="w-full !p-0 !m-0" name="message">
+          <div className="!bg-white absolute -bottom-0 flex items-center gap-2 w-full p-1">
+            <div className="flex-1 min-w-0 rounded-full bg-white border border-secondary-color px-4 py-2 flex items-center gap-3">
+              <Form.Item className="flex-1 min-w-0 !p-0 !m-0" name="message">
                 <Input
                   onChange={(e) => setTextValue(e.target.value)}
                   placeholder="Send your message..."
@@ -159,7 +159,7 @@ const ConversationSendMessage = ({ socket }: any) => {
                 />
               </Form.Item>
 
-              <Form.Item className="!p-0 !m-0" name="image">
+              <Form.Item className="!p-0 !m-0 shrink-0" name="image">
                 <Upload
                   fileList={[]}
                   onChange={handleImageChange}
@@ -205,14 +205,16 @@ const ConversationSendMessage = ({ socket }: any) => {
             </div>
 
             {isUploadLoading ? (
-              <SpinLoader />
+              <div className="shrink-0">
+                <SpinLoader />
+              </div>
             ) : (
               <button
                 disabled={!textValue?.length && uploadedImages.length === 0}
-                className="disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="shrink-0 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 type="submit"
               >
-                <FaTelegramPlane className="text-[#F9DD40] bg-secondary-color rounded-full p-2 text-4xl ms-3" />
+                <FaTelegramPlane className="text-[#F9DD40] bg-secondary-color rounded-full p-2 text-4xl" />
               </button>
             )}
           </div>

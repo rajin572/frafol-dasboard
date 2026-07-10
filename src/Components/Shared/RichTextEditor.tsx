@@ -90,22 +90,95 @@ function wrapContentWithStyles(htmlContent: string): string {
 }
 
 /**
- * ✅ Extract just the content (remove wrapper and styles) - FIXED
+ * ✅ Extract just the content (remove wrapper and styles)
  */
 function unwrapContent(wrappedHtml: string): string {
-    if (!wrappedHtml) return '';
+    if (!wrappedHtml) return "";
 
     // Remove the style tag
-    let content = wrappedHtml.replace(/<style>[\s\S]*?<\/style>/gi, '');
+    let content = wrappedHtml.replace(/<style>[\s\S]*?<\/style>/gi, "");
 
-    // Remove the wrapper div but keep inner content - FIXED REGEX
-    content = content.replace(/<div class="rte-content">([\s\S]*)<\/div>/i, '$1');
+    // Remove the wrapper div but keep inner content
+    content = content.replace(
+        /<div class="rte-content">([\s\S]*)<\/div>/i,
+        "$1"
+    );
 
     return content.trim();
 }
 
 /**
- * ✅ Renderer for Next.js - Just use dangerouslySetInnerHTML
+ * ✅ Get the caret position as a plain-text character offset within `element`.
+ * Returns null when the selection is outside the editor.
+ */
+function getCaretOffset(element: HTMLElement): number | null {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    const range = sel.getRangeAt(0);
+    if (!element.contains(range.endContainer)) return null;
+
+    const preRange = range.cloneRange();
+    preRange.selectNodeContents(element);
+    preRange.setEnd(range.endContainer, range.endOffset);
+    return preRange.toString().length;
+}
+
+/**
+ * ✅ Restore the caret to a plain-text character offset within `element`.
+ * Used after a full innerHTML replacement (undo / redo).
+ */
+function setCaretOffset(element: HTMLElement, offset: number) {
+    const sel = window.getSelection();
+    if (!sel) return;
+
+    const range = document.createRange();
+    const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        null
+    );
+
+    let remaining = offset;
+    let node: Text | null = walker.nextNode() as Text | null;
+
+    if (!node) {
+        // No text nodes — put caret inside the element itself.
+        range.selectNodeContents(element);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        return;
+    }
+
+    let target: Text = node;
+    let targetOffset = 0;
+
+    while (node) {
+        const len = node.textContent?.length ?? 0;
+        if (remaining <= len) {
+            target = node;
+            targetOffset = remaining;
+            break;
+        }
+        remaining -= len;
+        const next = walker.nextNode() as Text | null;
+        if (!next) {
+            // Ran past the end — clamp to the end of the last text node.
+            target = node;
+            targetOffset = len;
+            break;
+        }
+        node = next;
+    }
+
+    range.setStart(target, Math.min(targetOffset, target.textContent?.length ?? 0));
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+/**
+ * ✅ Renderer - Just use dangerouslySetInnerHTML
  */
 export function RichTextRenderer({
     html,
@@ -132,11 +205,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     minHeight = "500px",
     className = "",
 }) => {
-
-
-    console.log(content)
-
     const editorRef = useRef<HTMLDivElement>(null);
+    const isFocusedRef = useRef(false);
+
+    // --- Custom undo/redo history (replaces the broken native execCommand stack) ---
+    const historyRef = useRef<string[]>([]);
+    const caretRef = useRef<number[]>([]);
+    const historyIndexRef = useRef<number>(-1);
+    const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const isRestoringRef = useRef(false);
+    const initializedRef = useRef(false);
+    // Tracks the last value WE emitted so external prop changes can be told apart
+    // from our own echoes (an external change resets the editor + history).
+    const lastEmittedRef = useRef<string | null>(null);
+    // Last size chosen from the dropdown — used to convert text typed *after*
+    // the size was picked (Google-Docs style "set size then type").
+    const pendingFontSizeRef = useRef<number | null>(null);
+
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [linkDialog, setLinkDialog] = useState<LinkDialogState>({
         show: false,
@@ -153,40 +238,189 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         text: "",
     });
     const savedSelectionRef = useRef<Range | null>(null);
-    const [selectedColumnIndex, setSelectedColumnIndex] = useState<number | null>(null);
+    const [selectedColumnIndex, setSelectedColumnIndex] = useState<number | null>(
+        null
+    );
     const [isEmpty, setIsEmpty] = useState(true);
+    const [currentFontSize, setCurrentFontSize] = useState<number>(16);
 
-    // Track if this is the initial load
-    const isInitialLoad = useRef(true);
-
-    // ✅ FIXED: Initialize and update editor when content changes from parent
+    // Initialize the editor and sync genuine external content changes.
     useEffect(() => {
-        if (!editorRef.current) return;
+        const el = editorRef.current;
+        if (!el) return;
 
-        const unwrapped = unwrapContent(content || '');
-        const currentEditorContent = editorRef.current.innerHTML;
-
-        // Only update if content is actually different
-        if (unwrapped !== currentEditorContent) {
-            editorRef.current.innerHTML = unwrapped || "<p><br></p>";
+        // First mount: seed the editor and the history stack.
+        if (!initializedRef.current) {
+            const unwrapped = unwrapContent(content || "");
+            el.innerHTML = unwrapped || "<p><br></p>";
+            historyRef.current = [el.innerHTML];
+            caretRef.current = [0];
+            historyIndexRef.current = 0;
+            lastEmittedRef.current = content || null;
             setIsEmpty(stripText(unwrapped).length === 0);
+            initializedRef.current = true;
+            return;
         }
 
-        // Mark initial load as complete after first render
-        if (isInitialLoad.current) {
-            isInitialLoad.current = false;
+        // Ignore echoes of our own edits.
+        if (content === lastEmittedRef.current) return;
+        // Never clobber the DOM while the user is actively editing.
+        if (isFocusedRef.current) return;
+
+        const unwrapped = unwrapContent(content || "");
+        if (unwrapped !== el.innerHTML) {
+            el.innerHTML = unwrapped || "<p><br></p>";
+            historyRef.current = [el.innerHTML];
+            caretRef.current = [0];
+            historyIndexRef.current = 0;
+            setIsEmpty(stripText(unwrapped).length === 0);
         }
     }, [content]);
 
+    // Cleanup any pending debounce on unmount.
+    useEffect(() => {
+        return () => {
+            if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+        };
+    }, []);
+
     const focusEditor = () => editorRef.current?.focus();
 
-    const handleInput = () => {
+    // Push the parent state (wrapped) and update the empty flag.
+    const syncContent = () => {
         const html = editorRef.current?.innerHTML || "";
-
-        // Wrap with styles before saving
         const wrapped = wrapContentWithStyles(html);
+        lastEmittedRef.current = wrapped;
         setContent(wrapped);
         setIsEmpty(stripText(html).length === 0);
+    };
+
+    // Snapshot the current DOM into the history stack (no-op if unchanged).
+    const pushHistory = () => {
+        const el = editorRef.current;
+        if (!el) return;
+        const html = el.innerHTML;
+        if (historyRef.current[historyIndexRef.current] === html) return;
+
+        // Drop any redo branch, then append the new snapshot.
+        historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1);
+        caretRef.current = caretRef.current.slice(0, historyIndexRef.current + 1);
+        historyRef.current.push(html);
+        caretRef.current.push(getCaretOffset(el) ?? html.length);
+        historyIndexRef.current = historyRef.current.length - 1;
+    };
+
+    // Debounced snapshot for continuous typing (one entry per typing burst).
+    const scheduleHistory = () => {
+        if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+        typingTimerRef.current = setTimeout(() => {
+            pushHistory();
+            typingTimerRef.current = null;
+        }, 400);
+    };
+
+    const flushHistory = () => {
+        if (typingTimerRef.current) {
+            clearTimeout(typingTimerRef.current);
+            typingTimerRef.current = null;
+        }
+        pushHistory();
+    };
+
+    // Called after every discrete toolbar action.
+    const commit = () => {
+        syncContent();
+        flushHistory();
+    };
+
+    const restoreFromHistory = () => {
+        const el = editorRef.current;
+        if (!el) return;
+        isRestoringRef.current = true;
+        const html = historyRef.current[historyIndexRef.current] ?? "";
+        el.innerHTML = html;
+        el.focus();
+        setCaretOffset(el, caretRef.current[historyIndexRef.current] ?? html.length);
+        syncContent();
+        isRestoringRef.current = false;
+    };
+
+    const undo = () => {
+        // Make sure the latest typed burst is recorded so redo can return to it.
+        flushHistory();
+        if (historyIndexRef.current <= 0) return;
+        historyIndexRef.current -= 1;
+        restoreFromHistory();
+    };
+
+    const redo = () => {
+        if (historyIndexRef.current >= historyRef.current.length - 1) return;
+        historyIndexRef.current += 1;
+        restoreFromHistory();
+    };
+
+    // Convert execCommand's <font size="7"> wrappers into real px spans and make
+    // sure the new size wins over any nested size. Called both when a size is
+    // applied and on input (so text typed after choosing a size is converted).
+    const normalizeFontSizes = (px: number) => {
+        const root = editorRef.current;
+        if (!root) return;
+        root.querySelectorAll("font[size='7']").forEach((f) => {
+            const span = document.createElement("span");
+            span.style.fontSize = `${px}px`;
+            while (f.firstChild) span.appendChild(f.firstChild);
+            f.replaceWith(span);
+
+            // Strip any font-size still sitting on nested content so the NEW
+            // size actually wins (otherwise an inner size overrides it).
+            span
+                .querySelectorAll<HTMLElement>("[style*='font-size']")
+                .forEach((child) => {
+                    child.style.fontSize = "";
+                    if (!child.getAttribute("style")) child.removeAttribute("style");
+                });
+            span.querySelectorAll("font[size]").forEach((child) => {
+                child.removeAttribute("size");
+            });
+        });
+    };
+
+    // Read the size at the caret so the dropdown reflects the current selection.
+    const detectFontSize = () => {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return;
+        let node: Node | null = sel.anchorNode;
+        if (node && node.nodeType === 3) node = node.parentElement;
+        if (!node || !editorRef.current?.contains(node)) return;
+        const px = Math.round(
+            parseFloat(window.getComputedStyle(node as Element).fontSize)
+        );
+        if (!Number.isNaN(px)) setCurrentFontSize(px);
+    };
+
+    const handleInput = () => {
+        if (isRestoringRef.current) return;
+        // Text typed right after choosing a size arrives as <font size="7">;
+        // convert it to the chosen px so "pick a size then type" works.
+        if (pendingFontSizeRef.current != null) {
+            normalizeFontSizes(pendingFontSizeRef.current);
+        }
+        syncContent();
+        scheduleHistory();
+    };
+
+    // Intercept the browser's native undo/redo so it can never fight our stack.
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        const mod = e.ctrlKey || e.metaKey;
+        if (!mod) return;
+        const key = e.key.toLowerCase();
+        if (key === "z" && !e.shiftKey) {
+            e.preventDefault();
+            undo();
+        } else if (key === "y" || (key === "z" && e.shiftKey)) {
+            e.preventDefault();
+            redo();
+        }
     };
 
     const executeCommand = (command: string, value: string | null = null) => {
@@ -195,13 +429,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             setTimeout(() => {
                 focusEditor();
                 document.execCommand(command, false, value ?? undefined);
-                handleInput();
+                commit();
             }, 0);
             return;
         }
         focusEditor();
         document.execCommand(command, false, value ?? undefined);
-        handleInput();
+        commit();
     };
 
     const saveSelection = () => {
@@ -272,55 +506,57 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             restoreSelection();
             document.execCommand("createLink", false, url);
             makeSelectedLinkOpenInNewTab();
-            handleInput();
+            commit();
         }, 0);
     };
 
     const changeTextColor = (hex: string) => {
         if (isPreviewOpen) setIsPreviewOpen(false);
         focusEditor();
+        restoreSelection();
+        document.execCommand("styleWithCSS", false, "true");
         document.execCommand("foreColor", false, hex);
-        handleInput();
+        commit();
     };
 
     const applyFontSizePx = (px: number) => {
         if (isPreviewOpen) setIsPreviewOpen(false);
+        pendingFontSizeRef.current = px;
+        setCurrentFontSize(px);
         focusEditor();
+        restoreSelection();
 
+        // Emit <font size="7"> (not CSS) so we can reliably find + convert it, and
+        // so a collapsed caret marks the size for the next characters typed.
+        document.execCommand("styleWithCSS", false, "false");
         document.execCommand("fontSize", false, "7");
 
-        const root = editorRef.current;
-        if (!root) return;
-
-        const fonts = root.querySelectorAll("font[size='7']");
-        fonts.forEach((f) => {
-            const span = document.createElement("span");
-            span.style.fontSize = `${px}px`;
-            span.innerHTML = f.innerHTML;
-            f.replaceWith(span);
-        });
-
-        handleInput();
+        normalizeFontSizes(px);
+        commit();
     };
 
     const applyHighlightColor = (hex: string) => {
         if (isPreviewOpen) setIsPreviewOpen(false);
         focusEditor();
+        restoreSelection();
+        document.execCommand("styleWithCSS", false, "true");
 
         const ok = document.execCommand("hiliteColor", false, hex);
         if (!ok) document.execCommand("backColor", false, hex);
 
-        handleInput();
+        commit();
     };
 
     const removeHighlight = () => {
         if (isPreviewOpen) setIsPreviewOpen(false);
         focusEditor();
+        restoreSelection();
+        document.execCommand("styleWithCSS", false, "true");
 
         const ok = document.execCommand("hiliteColor", false, "transparent");
         if (!ok) document.execCommand("backColor", false, "transparent");
 
-        handleInput();
+        commit();
     };
 
     const handlePaste = (e: React.ClipboardEvent) => {
@@ -335,7 +571,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 focusEditor();
                 restoreSelection();
                 document.execCommand("insertText", false, text);
-                handleInput();
+                commit();
             }, 0);
             return;
         }
@@ -351,7 +587,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             focusEditor();
             restoreSelection();
             document.execCommand("insertHTML", false, html);
-            handleInput();
+            commit();
         }, 0);
     };
 
@@ -363,7 +599,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             focusEditor();
             restoreSelection();
             document.execCommand("insertText", false, text);
-            handleInput();
+            commit();
         }, 0);
     };
 
@@ -387,7 +623,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             });
     };
 
-    const highlightSelectedColumn = (table: HTMLTableElement, colIndex: number) => {
+    const highlightSelectedColumn = (
+        table: HTMLTableElement,
+        colIndex: number
+    ) => {
         clearSelectedColumnStyles();
         Array.from(table.rows).forEach((row) => {
             const cell = row.cells.item(colIndex) as HTMLElement | null;
@@ -474,41 +713,50 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 const cell = row.cells.item(selectedColumnIndex);
                 if (cell) (cell as HTMLElement).style.textAlign = align;
             });
-            handleInput();
+            commit();
             return;
         }
 
         const cell = anchor?.closest("td, th") as HTMLElement | null;
         if (cell) {
             cell.style.textAlign = align;
-            handleInput();
+            commit();
         }
     };
-
 
     const applyLineHeight = (lineHeight: string) => {
         if (isPreviewOpen) setIsPreviewOpen(false);
         focusEditor();
 
+        const root = editorRef.current;
         const sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
+        if (!root || !sel || sel.rangeCount === 0) return;
 
-        // Get the selected content or current paragraph
         const range = sel.getRangeAt(0);
-        let container = range.commonAncestorContainer;
+        const blockSelector =
+            "p, div, li, h1, h2, h3, h4, h5, h6, td, th";
 
-        // If it's a text node, get its parent element
-        if (container.nodeType === 3) {
-            container = container.parentElement as Node;
+        // Apply to every block that intersects the selection (multi-paragraph safe).
+        const blocks = Array.from(
+            root.querySelectorAll(blockSelector)
+        ) as HTMLElement[];
+        const affected = blocks.filter((b) => range.intersectsNode(b));
+
+        if (affected.length > 0) {
+            affected.forEach((b) => {
+                b.style.lineHeight = lineHeight;
+            });
+        } else {
+            let container: Node = range.commonAncestorContainer;
+            if (container.nodeType === 3) container = container.parentElement as Node;
+            const block = (container as HTMLElement).closest(
+                blockSelector
+            ) as HTMLElement | null;
+            if (block) block.style.lineHeight = lineHeight;
+            else root.style.lineHeight = lineHeight;
         }
 
-        // Find the closest block element (p, div, li, etc.)
-        const blockElement = (container as HTMLElement).closest('p, div, li, h1, h2, h3, h4, h5, h6, td, th');
-
-        if (blockElement) {
-            (blockElement as HTMLElement).style.lineHeight = lineHeight;
-            handleInput();
-        }
+        commit();
     };
 
     const toggleList = (type: "ul" | "ol") => {
@@ -519,9 +767,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const insertHorizontalLine = () => executeCommand("insertHorizontalRule");
 
     const clearFormatting = () => {
-        executeCommand("removeFormat");
-        executeCommand("unlink");
-        handleInput();
+        if (isPreviewOpen) setIsPreviewOpen(false);
+        focusEditor();
+        document.execCommand("removeFormat");
+        document.execCommand("unlink");
+        commit();
     };
 
     const plainTextLength = stripText(editorRef.current?.innerHTML || "").length;
@@ -537,6 +787,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }> = ({ onClick, icon, title, active = false }) => (
         <button
             type="button"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={onClick}
             title={title}
             className={`p-2.5 rounded-md transition-all duration-200 border ${active
@@ -549,7 +800,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     );
 
     return (
-        <div className={`bg-white rounded-xl overflow-hidden border border-gray-200 ${className}`}>
+        <div
+            className={`bg-white rounded-xl overflow-hidden border border-gray-200 ${className}`}
+        >
             {/* Toolbar */}
             <div className="border-b border-gray-200 bg-[#efefef] p-3">
                 <div className="flex flex-wrap gap-2 items-center">
@@ -563,18 +816,26 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     </button>
 
                     <div className="flex gap-1.5 pr-3 border-r border-gray-300">
-                        <ToolbarButton onClick={() => executeCommand("undo")} icon={<Undo size={18} />} title="Undo (Ctrl+Z)" />
-                        <ToolbarButton onClick={() => executeCommand("redo")} icon={<Redo size={18} />} title="Redo (Ctrl+Y)" />
+                        <ToolbarButton onClick={undo} icon={<Undo size={18} />} title="Undo (Ctrl+Z)" />
+                        <ToolbarButton onClick={redo} icon={<Redo size={18} />} title="Redo (Ctrl+Y)" />
                     </div>
 
                     <div className="flex items-center gap-2 px-3 border-r border-gray-300">
                         <Type size={16} className="text-gray-600" />
                         <select
+                            onMouseDown={saveSelection}
+                            value={currentFontSize}
                             onChange={(e) => applyFontSizePx(parseInt(e.target.value))}
                             className="px-3 py-2.5 border border-gray-300 rounded-md bg-white hover:border-[#ad2b08] focus:outline-none focus:ring-2 focus:ring-[#ad2b08] text-sm font-medium text-[#2c2c2c]"
-                            defaultValue="16"
                             title="Text Size"
                         >
+                            {![12, 14, 16, 18, 20, 24, 28, 32, 40, 48].includes(
+                                currentFontSize
+                            ) && (
+                                    <option value={currentFontSize}>
+                                        {currentFontSize}px
+                                    </option>
+                                )}
                             <option value="12">12px</option>
                             <option value="14">14px</option>
                             <option value="16">16px</option>
@@ -592,11 +853,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     <div className="flex items-center gap-2 px-3 border-r border-gray-300">
                         <span className="text-xs font-semibold text-gray-600">Line:</span>
                         <select
-                            onChange={(e) => applyLineHeight(e.target.value)}
+                            onChange={(e) => {
+                                applyLineHeight(e.target.value);
+                                e.target.selectedIndex = 0;
+                            }}
                             className="px-3 py-2.5 border border-gray-300 rounded-md bg-white hover:border-[#ad2b08] focus:outline-none focus:ring-2 focus:ring-[#ad2b08] text-sm font-medium text-[#2c2c2c]"
-                            defaultValue="1.6"
+                            defaultValue=""
                             title="Line Height"
                         >
+                            <option value="" disabled>
+                                1.6
+                            </option>
                             <option value="1">1.0</option>
                             <option value="1.15">1.15</option>
                             <option value="1.5">1.5</option>
@@ -614,6 +881,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                             <input
                                 type="color"
                                 defaultValue="#2c2c2c"
+                                onMouseDown={saveSelection}
                                 onChange={(e) => changeTextColor(e.target.value)}
                                 className="w-8 h-8 cursor-pointer"
                                 title="Text Color"
@@ -628,6 +896,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                             <input
                                 type="color"
                                 defaultValue="#fff3a3"
+                                onMouseDown={saveSelection}
                                 onChange={(e) => applyHighlightColor(e.target.value)}
                                 className="w-8 h-8 cursor-pointer"
                                 title="Highlight Color"
@@ -635,6 +904,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         </label>
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={removeHighlight}
                             className="px-3 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-sm font-semibold"
                             title="Remove Highlight"
@@ -698,7 +968,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     ref={editorRef}
                     className="rte-content outline-none p-8 focus:ring-2 max-h-[70vh] focus:ring-[#ad2b0855] focus:ring-inset overflow-auto"
                     contentEditable
+                    onFocus={() => {
+                        isFocusedRef.current = true;
+                    }}
+                    onBlur={() => {
+                        isFocusedRef.current = false;
+                    }}
                     onInput={handleInput}
+                    onKeyDown={handleKeyDown}
+                    onKeyUp={detectFontSize}
+                    onMouseUp={detectFontSize}
                     onPaste={handlePaste}
                     onClick={handleEditorClick}
                     suppressContentEditableWarning
@@ -761,7 +1040,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </>
             )}
 
-            {/* Paste, Link, Table Dialogs - unchanged */}
+            {/* Paste, Link, Table Dialogs */}
             {pasteDialog.show && (
                 <>
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]" />
@@ -835,7 +1114,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             )}
 
             {/* Add embedded styles for the editor */}
-            <style dangerouslySetInnerHTML={{ __html: EMBEDDED_STYLES.replace(/<\/?style>/g, '') }} />
+            <style dangerouslySetInnerHTML={{ __html: EMBEDDED_STYLES.replace(/<\/?style>/g, "") }} />
         </div>
     );
 };
