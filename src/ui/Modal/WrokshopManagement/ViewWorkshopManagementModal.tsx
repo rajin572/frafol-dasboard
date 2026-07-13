@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal } from "antd";
 import { IWorkshop } from "../../../types";
 import { getImageUrl } from "../../../helpers/config/envConfig";
@@ -8,6 +8,8 @@ import { formatDate, formetTime } from "../../../utils/dateFormet";
 import { LuClock, LuUsers } from "react-icons/lu";
 import { FaLink } from "react-icons/fa";
 import { MdLocationPin } from "react-icons/md";
+import ReuseButton from "../../Button/ReuseButton";
+import ViewWorkshopParticipantsModal from "./ViewWorkshopParticipantsModal";
 
 // InitialValues
 
@@ -23,6 +25,9 @@ const ViewWorkshopManagementModal: React.FC<ViewWorkshopManagementModalProps> = 
     currentRecord,
 }) => {
     const serverUrl = getImageUrl();
+    const [isParticipantsModalVisible, setIsParticipantsModalVisible] =
+        useState(false);
+
     return (
         <Modal
             open={isViewModalVisible}
@@ -118,6 +123,23 @@ const ViewWorkshopManagementModal: React.FC<ViewWorkshopManagementModalProps> = 
                     </div>
                 </div>
             </div>
+
+            <div className="mt-5">
+                <ReuseButton
+                    variant="secondary"
+                    className="!py-2.5 !text-sm !w-full"
+                    onClick={() => setIsParticipantsModalVisible(true)}
+                >
+                    View Participants
+                </ReuseButton>
+            </div>
+
+            <ViewWorkshopParticipantsModal
+                isModalVisible={isParticipantsModalVisible}
+                handleCancel={() => setIsParticipantsModalVisible(false)}
+                workshopId={currentRecord?._id}
+                workshopTitle={currentRecord?.title}
+            />
         </Modal>
     );
 };

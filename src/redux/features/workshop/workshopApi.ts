@@ -36,6 +36,13 @@ const gearApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.workshop],
     }),
+    getWorkshopParticipants: builder.query({
+      query: (workshopId: string) => ({
+        url: `/workshop/participants/${workshopId}`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.workshop],
+    }),
   }),
 });
 
@@ -44,4 +51,5 @@ export const {
   useGetAllPendingWorkshopQuery,
   useUpdateWorkshopApprovalStatusMutation,
   useDeleteWorkshopMutation,
+  useGetWorkshopParticipantsQuery,
 } = gearApi;
