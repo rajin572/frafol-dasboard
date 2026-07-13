@@ -5,13 +5,19 @@ import {
   View,
   StyleSheet,
   Image,
+  Font,
 } from "@react-pdf/renderer";
 import { AllImages } from "../../public/images/AllImages";
 import { formatDate } from "./dateFormet";
 import { ITransaction } from "../types";
 
+Font.register({
+  family: "Roboto",
+  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf",
+});
+
 const styles = StyleSheet.create({
-  page: { backgroundColor: "#fafafa", padding: 30 },
+  page: { fontFamily: "Roboto", backgroundColor: "#fafafa", padding: 30 },
   header: { fontSize: 18, textAlign: "center", marginBottom: 30, color: "#ad2b08" },
   headerSection: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
   section: { marginBottom: 10 },
@@ -25,12 +31,27 @@ const styles = StyleSheet.create({
   image: { width: 200, height: "auto", objectFit: "cover" },
 });
 
-const InvoiceGearFromAdminSide = ({ currentRecord }: { currentRecord: ITransaction }) => {
+const InvoiceGearFromAdminSide = ({
+  currentRecord,
+}: {
+  currentRecord: ITransaction;
+}) => {
   const gear = currentRecord.gear!;
   const seller = currentRecord.seller;
   const client = currentRecord.client;
-  const platformCommission = gear.platformCommission;
-  const sellerIsCompany = !!(seller?.ico);
+  const platformCommission = gear.platformCommission || 0;
+  const invoiceRef =
+    currentRecord.orderId || currentRecord._id.slice(-8).toUpperCase();
+
+  // Street + number, zip code, town (seller's registered address)
+  const sellerAddressParts = [
+    seller?.address,
+    [seller?.zipCode, seller?.town].filter(Boolean).join(" "),
+  ].filter(Boolean);
+  const sellerFullAddress =
+    sellerAddressParts.length > 0
+      ? sellerAddressParts.join(", ")
+      : "__________";
 
   return (
     <Document language="sk">
@@ -41,10 +62,13 @@ const InvoiceGearFromAdminSide = ({ currentRecord }: { currentRecord: ITransacti
           <Image src={AllImages.logo} style={styles.image} />
           <View style={styles.section}>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Číslo faktúry / Invoice number:</Text> [{currentRecord.orderId || currentRecord._id.slice(-8).toUpperCase()}]
+              <Text style={styles.textBold}>Číslo faktúry / Invoice number:</Text> {invoiceRef}
             </Text>
             <Text style={styles.text}>
               <Text style={styles.textBold}>Dátum vystavenia / Issue date:</Text> {formatDate(currentRecord.createdAt)}
+            </Text>
+            <Text style={styles.text}>
+              <Text style={styles.textBold}>Dátum dodania / Date of service delivery:</Text> {formatDate(currentRecord.createdAt)}
             </Text>
           </View>
         </View>
@@ -70,65 +94,70 @@ const InvoiceGearFromAdminSide = ({ currentRecord }: { currentRecord: ITransacti
             </Text>
           </View>
 
-          {/* Seller — Client receiving the invoice */}
+          {/* Client — Seller */}
           <View style={styles.section}>
             <Text style={styles.subHeader}>ODBERATEĽ / CLIENT (Seller)</Text>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Meno / Name:</Text> {seller?.name || "—"}
+              <Text style={styles.textBold}>Názov firmy / Company name:</Text>{" "}
+              {seller?.companyName || seller?.name || "____"}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Názov firmy / Company name:</Text> {seller?.companyName || "____"}
+              <Text style={styles.textBold}>Adresa / Address:</Text> {sellerFullAddress}
             </Text>
-            <Text style={styles.text}>
-              <Text style={styles.textBold}>Adresa / Address:</Text> {seller?.address || "__________"}
-            </Text>
-            {sellerIsCompany && (
-              <>
-                <Text style={styles.text}>
-                  <Text style={styles.textBold}>IČO / Company ID:</Text> {seller?.ico}
-                </Text>
-                <Text style={styles.text}>
-                  <Text style={styles.textBold}>DIČ / Tax ID:</Text> {seller?.dic || "____"}
-                </Text>
-                <Text style={styles.text}>
-                  <Text style={styles.textBold}>IČ DPH / VAT ID:</Text> {seller?.ic_dph || "____"}
-                </Text>
-              </>
+            {seller?.ico && (
+              <Text style={styles.text}>
+                <Text style={styles.textBold}>IČO / Company ID:</Text> {seller.ico}
+              </Text>
+            )}
+            {seller?.dic && (
+              <Text style={styles.text}>
+                <Text style={styles.textBold}>DIČ / Tax ID:</Text> {seller.dic}
+              </Text>
+            )}
+            {seller?.ic_dph && (
+              <Text style={styles.text}>
+                <Text style={styles.textBold}>IČ DPH / VAT ID (if VAT payer):</Text> {seller.ic_dph}
+              </Text>
             )}
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Email:</Text> {seller?.email || "—"}
+              <Text style={styles.textBold}>Email:</Text> {seller?.email || "____"}
             </Text>
           </View>
         </View>
 
-        {/* Order Details */}
+        {/* Order details */}
         <View style={{ ...styles.section, marginBottom: 20 }}>
           <Text style={styles.subHeader}>DETAILY OBJEDNÁVKY / ORDER DETAILS</Text>
           <Text style={styles.text}>
-            <Text style={styles.textBold}>Produkt / Product:</Text> {gear.name}
+            <Text style={styles.textBold}>Produkt (Product):</Text> {gear.name}
           </Text>
           <Text style={styles.text}>
-            <Text style={styles.textBold}>ID objednávky / Order ID:</Text> {currentRecord.orderId || "—"}
+            <Text style={styles.textBold}>ID objednávky (Order ID):</Text> {invoiceRef}
           </Text>
           <Text style={styles.text}>
-            <Text style={styles.textBold}>Kupujúci / Buyer:</Text> {client?.name || "—"} ({client?.email || "—"})
+            <Text style={styles.textBold}>Kupujúci (Buyer):</Text>{" "}
+            {client?.name || "—"} ({client?.email || "—"})
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.textBold}>Dodacia adresa (Shipping Address):</Text>{" "}
+            {client?.address || "—"}, {client?.town || "—"}, {client?.zipCode || "—"}
           </Text>
         </View>
 
-        {/* Table — Platform Commission Only */}
+        {/* Table — commission only */}
         <View style={styles.table}>
           <View style={{ ...styles.tableRow, backgroundColor: "#ad2b08" }}>
-            <Text style={styles.tableCell}>SLUŽBA / SERVICE</Text>
+            <Text style={styles.tableCell}>PRODUKT / PRODUCT</Text>
             <Text style={styles.tableCell}>MNOŽSTVO / QTY</Text>
             <Text style={styles.tableCell}>CENA / PRICE</Text>
             <Text style={styles.tableCell}>SPOLU / TOTAL</Text>
           </View>
 
           <View style={styles.tableRow}>
-            <Text style={styles.tableCellDark}>Servisný poplatok platformy / Platform Commission</Text>
+            <Text style={styles.tableCellDark}>Servisný poplatok platformy / Platform Service Fee</Text>
             <Text style={styles.tableCellDark}>1 ks / <Text style={{ color: "#ad2b08" }}>pc</Text></Text>
-            <Text style={styles.tableCellDark}>€{platformCommission.toFixed(2)}</Text>
-            <Text style={styles.tableCellDark}>€{platformCommission.toFixed(2)}</Text>
+            <Text style={styles.tableCellDark}>{platformCommission.toFixed(2)}€</Text>
+            <Text style={styles.tableCellDark}>{platformCommission.toFixed(2)}€</Text>
           </View>
         </View>
 
@@ -137,7 +166,7 @@ const InvoiceGearFromAdminSide = ({ currentRecord }: { currentRecord: ITransacti
           <Text style={{ ...styles.text, marginBottom: 5 }}>
             <Text style={{ fontWeight: "bold", color: "#000000" }}>MEDZISÚČET / </Text>
             <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>SUBTOTAL: </Text>
-            <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>€{platformCommission.toFixed(2)}</Text>
+            <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>{platformCommission.toFixed(2)}€</Text>
           </Text>
           <Text
             style={{
@@ -153,7 +182,7 @@ const InvoiceGearFromAdminSide = ({ currentRecord }: { currentRecord: ITransacti
             }}
           >
             <Text>SPOLU / TOTAL: </Text>
-            <Text>€{platformCommission.toFixed(2)}</Text>
+            <Text>{platformCommission.toFixed(2)}€</Text>
           </Text>
         </View>
 
