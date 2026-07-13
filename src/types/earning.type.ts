@@ -11,6 +11,8 @@ export interface UserSummary {
   dic?: string;
   ic_dph?: string;
   address?: string;
+  town?: string;
+  zipCode?: string;
   phone?: string;
 }
 
@@ -70,6 +72,13 @@ export interface ITransaction {
   subscriptionDays?: number;
   serviceProviderPaid?: boolean;
   isRegisterAsCompany?: boolean;
+  companyName?: string;
+  IC_DPH?: string;
+  name?: string;
+  streetAddress?: string;
+  town?: string;
+  zipCode?: string;
+  country?: string;
   serviceProviders?: UserSummary[];
   createdAt: string;
   updatedAt?: string;

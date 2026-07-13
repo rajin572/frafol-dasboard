@@ -1,10 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Font,
+} from "@react-pdf/renderer";
 import { AllImages } from "../../public/images/AllImages";
 import { formatDate } from "./dateFormet";
+import { ITransaction, UserSummary } from "../types";
+
+Font.register({
+  family: "Roboto",
+  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf",
+});
 
 const styles = StyleSheet.create({
-  page: { backgroundColor: "#fafafa", padding: 30 },
+  page: { fontFamily: "Roboto", backgroundColor: "#fafafa", padding: 30 },
   header: { fontSize: 18, textAlign: "center", marginBottom: 30, color: "#ad2b08" },
   headerSection: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
   section: { marginBottom: 10 },
@@ -22,15 +35,35 @@ const InvoiceWorkshopFromAdminSide = ({
   record,
   professional,
 }: {
-  record: any;
-  professional: any;
+  record: ITransaction;
+  professional?: UserSummary;
 }) => {
-  const workshop = record.workshopId;
+  const workshop =
+    record.workshopId && typeof record.workshopId !== "string"
+      ? record.workshopId
+      : null;
   const price = workshop?.price || 0;
   const vatAmount = workshop?.vatAmount || 0;
   const mainPrice = workshop?.mainPrice || 0;
   const platformCommission = mainPrice - price - vatAmount;
-  const invoiceRef = record._id?.slice(-8).toUpperCase() || "—";
+  const invoiceRef =
+    record.orderId || record._id?.slice(-8).toUpperCase() || "—";
+
+  // Street + zip + town (instructor's registered address)
+  const professionalAddressParts = [
+    professional?.address,
+    [professional?.zipCode, professional?.town].filter(Boolean).join(" "),
+  ].filter(Boolean);
+  const professionalFullAddress =
+    professionalAddressParts.length > 0
+      ? professionalAddressParts.join(", ")
+      : "__________";
+
+  const participantName =
+    (record.isRegisterAsCompany && record.companyName) ||
+    record.name ||
+    record.userId?.name ||
+    "____";
 
   return (
     <Document language="sk">
@@ -81,7 +114,7 @@ const InvoiceWorkshopFromAdminSide = ({
               {professional?.companyName || professional?.name || "____"}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.textBold}>Adresa / Address:</Text> {professional?.address || "__________"}
+              <Text style={styles.textBold}>Adresa / Address:</Text> {professionalFullAddress}
             </Text>
             {professional?.ico && (
               <Text style={styles.text}>
@@ -108,12 +141,23 @@ const InvoiceWorkshopFromAdminSide = ({
             <Text style={styles.textBold}>Workshop:</Text> {workshop?.title || "—"}
           </Text>
           <Text style={styles.text}>
-            <Text style={styles.textBold}>Účastník / Participant:</Text>{" "}
-            {record.userId?.name || "—"} ({record.userId?.email || "—"})
+            <Text style={styles.textBold}>Účastník / Participant:</Text> {participantName} ({record.userId?.email || "—"})
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.textBold}>Adresa / Address:</Text> {record.streetAddress || "__________"}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.textBold}>PSČ / Zip code:</Text> {record.zipCode || "____"}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.textBold}>Mesto / Town:</Text> {record.town || "____"}
+          </Text>
+          <Text style={styles.text}>
+            <Text style={styles.textBold}>Krajina / Country:</Text> {record.country || "____"}
           </Text>
         </View>
 
-        {/* Pricing table */}
+        {/* Table — commission only */}
         <View style={styles.table}>
           <View style={{ ...styles.tableRow, backgroundColor: "#ad2b08" }}>
             <Text style={styles.tableCell}>PRODUKT / PRODUCT</Text>
@@ -122,7 +166,6 @@ const InvoiceWorkshopFromAdminSide = ({
             <Text style={styles.tableCell}>SPOLU / TOTAL</Text>
           </View>
 
-          {/* Platform commission row */}
           <View style={styles.tableRow}>
             <Text style={styles.tableCellDark}>Servisný poplatok platformy / Platform Service Fee</Text>
             <Text style={styles.tableCellDark}>1 ks / <Text style={{ color: "#ad2b08" }}>pc</Text></Text>
@@ -136,7 +179,7 @@ const InvoiceWorkshopFromAdminSide = ({
           <Text style={{ ...styles.text, marginBottom: 5 }}>
             <Text style={{ fontWeight: "bold", color: "#000000" }}>MEDZISÚČET / </Text>
             <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>SUBTOTAL: </Text>
-            <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>{(platformCommission).toFixed(2)}€</Text>
+            <Text style={{ fontWeight: "bold", color: "#ad2b08" }}>{platformCommission.toFixed(2)}€</Text>
           </Text>
           <Text
             style={{
