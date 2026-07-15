@@ -84,7 +84,14 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 403) {
+  if (result?.error?.status === 404) {
+    Cookies.remove("frafoldashboard_accessToken");
+    Cookies.remove("frafoldashboard_refreshToken");
+    window.location.href = "/sign-in";
+    return result;
+  }
+
+  if (result?.error?.status === 403 || result?.error?.status === 401) {
     const newToken = await refreshAccessToken();
 
     if (newToken) {
