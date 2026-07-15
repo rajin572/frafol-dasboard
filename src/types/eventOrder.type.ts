@@ -56,6 +56,8 @@ interface IEventOrder {
     dic: string;
     ico: string;
     address: string;
+    town?: string;
+    zipCode?: string;
     companyName: string;
   }; // Assuming this is a service provider ID string
   date: Date;
@@ -83,6 +85,8 @@ interface IEventOrder {
   country?: string; // Optional, country for custom orders
   isRegisterAsCompany?: boolean; // Optional, if registered as a company
   companyName?: string; // Optional, company name if registered as a company
+  couponDiscount?: number; // Optional, coupon discount amount applied
+  couponCode?: string; // Optional, coupon code applied
   ICO?: string; // Optional, ICO for company
   DIC?: string; // Optional, DIC for company
   IC_DPH?: string; // Optional, IC_DPH for company

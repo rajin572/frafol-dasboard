@@ -28,6 +28,8 @@ const AdminAllTransaction = () => {
   const total = data?.data?.meta?.total || 0;
   const payments: any = data?.data?.orders || [];
 
+  console.log("Payment Page ==>", payments);
+
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<any | null>(null);

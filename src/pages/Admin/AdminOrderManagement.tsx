@@ -44,6 +44,8 @@ const AdminOrderManagement = () => {
   const eventOrder: IEventOrder[] = data?.data || [];
   const totalEventOrder = data?.meta?.total || 0;
 
+  console.log("Event Order ==>", eventOrder);
+
   const { data: gearData, isFetching: isGearFetching } =
     useGetAllGearOrderManagementQuery(
       {
@@ -61,7 +63,6 @@ const AdminOrderManagement = () => {
   const gearOrder: IGearOrder[] = gearData?.data?.data || [];
   const totalGearOrder = gearData?.meta?.total || 0;
 
-  console.log("Admin Gear Management", gearOrder)
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [showCancelPaymentModal, setShowCancelPaymentModal] = useState(false);
