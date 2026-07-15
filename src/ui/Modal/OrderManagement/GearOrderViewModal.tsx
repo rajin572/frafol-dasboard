@@ -6,7 +6,7 @@ import { IGearOrder } from "../../../types";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
-import InvoiceGearFromAdminSide from "../../../utils/InvoiceGearFromAdminSide";
+import InvoiceGearOrderFromAdminSide from "../../../utils/InvoiceGearOrderFromAdminSide";
 
 interface GearOrderViewModalProps {
   isViewModalVisible: boolean;
@@ -25,7 +25,7 @@ const GearOrderViewModal: React.FC<GearOrderViewModalProps> = ({
     });
     // Generate the PDF using @react-pdf/renderer's pdf function
     pdf(
-      <InvoiceGearFromAdminSide currentRecord={currentRecord as IGearOrder} />
+      <InvoiceGearOrderFromAdminSide currentRecord={currentRecord as IGearOrder} />
     )
       .toBlob()
       .then((blob: any) => {
